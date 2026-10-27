@@ -1,0 +1,8 @@
+{
+  "name": "pathify-ai-backend",
+  "version": "1.0.0",
+  "description": "Pathify-AI Backend API with FastAPI and PostgreSQL",
+  "scripts": {
+    "start": ".\\.venv\\Scripts\\uvicorn backend.app.main:app --host 0.0.0.0 --port 5000 --reload"
+  }
+}
