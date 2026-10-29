@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pathify-AI | Career Roadmap & Skill Mapping Engine</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+
+  <!-- Top Navigation Header -->
+  <header class="sticky top-0 z-50 backdrop-blur-md bg-slate-900/80 border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <!-- Brand Logo -->
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('dashboard')">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/25">
+          <i data-lucide="compass" class="w-6 h-6 text-white"></i>
+        </div>
+        <div>
+          <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent">
+            Pathify<span class="text-indigo-400">.AI</span>
+          </span>
+          <span class="hidden sm:inline-block ml-2 px-2 py-0.5 text-xs font-semibold rounded-full bg-indigo-900/60 text-indigo-300 border border-indigo-700/50">
+            Prototype Demo
+          </span>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="hidden md:flex space-x-1 lg:space-x-2">
+        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn px-3 py-2 text-sm font-medium rounded-lg text-indigo-400 bg-slate-800/80 flex items-center gap-1.5 transition">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+        </button>
+        <button onclick="switchTab('careers')" id="nav-careers" class="nav-btn px-3 py-2 text-sm font-medium rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 flex items-center gap-1.5 transition">
+          <i data-lucide="briefcase" class="w-4 h-4"></i> Careers
+        </button>
+        <button onclick="switchTab('skillgap')" id="nav-skillgap" class="nav-btn px-3 py-2 text-sm font-medium rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 flex items-center gap-1.5 transition">
+          <i data-lucide="git-compare" class="w-4 h-4"></i> Skill Gap
+        </button>
+        <button onclick="switchTab('roadmap')" id="nav-roadmap" class="nav-btn px-3 py-2 text-sm font-medium rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 flex items-center gap-1.5 transition">
+          <i data-lucide="map" class="w-4 h-4"></i> Roadmap
+        </button>
+        <button onclick="switchTab('chat')" id="nav-chat" class="nav-btn px-3 py-2 text-sm font-medium rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 flex items-center gap-1.5 transition">
+          <i data-lucide="bot" class="w-4 h-4 text-cyan-400"></i> AI Mentor
+        </button>
+      </nav>
+
+      <!-- System Health Indicator -->
+      <div class="flex items-center space-x-3">
+        <div id="health-badge" class="flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-950/80 border border-emerald-800/60 text-emerald-400">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="health-text">PostgreSQL Online</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Navigation Bar -->
+  <div class="md:hidden flex justify-around bg-slate-900 border-b border-slate-800 py-2 px-2">
+    <button onclick="switchTab('dashboard')" class="text-xs px-2 py-1 rounded flex flex-col items-center text-indigo-400"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>Dash</button>
+    <button onclick="switchTab('careers')" class="text-xs px-2 py-1 rounded flex flex-col items-center text-slate-400"><i data-lucide="briefcase" class="w-4 h-4"></i>Roles</button>
+    <button onclick="switchTab('skillgap')" class="text-xs px-2 py-1 rounded flex flex-col items-center text-slate-400"><i data-lucide="git-compare" class="w-4 h-4"></i>Gap</button>
+    <button onclick="switchTab('roadmap')" class="text-xs px-2 py-1 rounded flex flex-col items-center text-slate-400"><i data-lucide="map" class="w-4 h-4"></i>Roadmap</button>
+    <button onclick="switchTab('chat')" class="text-xs px-2 py-1 rounded flex flex-col items-center text-slate-400"><i data-lucide="bot" class="w-4 h-4"></i>AI Chat</button>
+  </div>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- ========================================== -->
+    <!-- 1. DASHBOARD VIEW -->
+    <!-- ========================================== -->
+    <section id="view-dashboard" class="space-y-10 animate-fade-in">
+      <!-- Hero Banner -->
+      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-b from-indigo-950/60 via-slate-900 to-slate-900/80 border border-indigo-900/40 p-8 sm:p-12">
+        <div class="relative z-10 max-w-3xl space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-semibold">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-indigo-400"></i> Next-Gen Industry Career Mapping Engine
+          </div>
+          <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
+            Map Your Skills. Close the Gap. <br>
+            <span class="bg-gradient-to-r from-indigo-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">Land Your Dream Tech Role.</span>
+          </h1>
+          <p class="text-base sm:text-lg text-slate-300 leading-relaxed">
+            Pathify-AI benchmarks your existing skillset against real-time industry roles, isolates your skill deficits, and dynamically generates actionable learning roadmaps.
+          </p>
+          <div class="pt-4 flex flex-wrap gap-3">
+            <button onclick="switchTab('careers')" class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold flex items-center gap-2 shadow-lg shadow-indigo-600/30 transition">
+              <i data-lucide="compass" class="w-4 h-4"></i> Explore 3 Career Paths
+            </button>
+            <button onclick="switchTab('skillgap')" class="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold flex items-center gap-2 transition">
+              <i data-lucide="git-compare" class="w-4 h-4 text-cyan-400"></i> Test My Skill Gap
+            </button>
+            <button onclick="switchTab('chat')" class="px-6 py-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-cyan-800/40 font-semibold flex items-center gap-2 transition">
+              <i data-lucide="bot" class="w-4 h-4 text-emerald-400"></i> Ask AI Mentor
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Metrics Overview -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+            <i data-lucide="briefcase" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div id="stat-roles" class="text-2xl font-bold text-white">3 Active Roles</div>
+            <div class="text-xs text-slate-400">Full-Stack, Data Analyst, AI Eng.</div>
+          </div>
+        </div>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+            <i data-lucide="layers" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div id="stat-skills" class="text-2xl font-bold text-white">21+ Skills Mapped</div>
+            <div class="text-xs text-slate-400">Standardized tech requirements</div>
+          </div>
+        </div>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+            <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="text-2xl font-bold text-white">Live PostgreSQL DB</div>
+            <div class="text-xs text-slate-400">Persisted student profiles</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Featured Roles Preview -->
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="star" class="w-5 h-5 text-amber-400"></i> Supported Career Pathways
+          </h2>
+          <button onclick="switchTab('careers')" class="text-sm text-indigo-400 hover:text-indigo-300 font-medium">View all &rarr;</button>
+        </div>
+        <div id="dashboard-roles-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- 2. CAREER SELECTION VIEW -->
+    <!-- ========================================== -->
+    <section id="view-careers" class="space-y-6 hidden animate-fade-in">
+      <div class="border-b border-slate-800 pb-5">
+        <h2 class="text-2xl font-bold text-white">Target Career Pathways</h2>
+        <p class="text-slate-400 text-sm mt-1">Select an industry role below to inspect required skill sets or jump directly into the Skill-Gap Analyzer.</p>
+      </div>
+
+      <div id="careers-roles-container" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Dynamic Role Cards -->
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- 3. SKILL GAP ANALYZER VIEW -->
+    <!-- ========================================== -->
+    <section id="view-skillgap" class="space-y-8 hidden animate-fade-in">
+      <div class="border-b border-slate-800 pb-5">
+        <h2 class="text-2xl font-bold text-white">Skill-Gap Analyzer</h2>
+        <p class="text-slate-400 text-sm mt-1">Select your target career, check off the skills you already possess, and immediately uncover your missing skills.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Left Column: Input Form -->
+        <div class="lg:col-span-6 space-y-6 bg-slate-900/60 border border-slate-800 rounded-2xl p-6">
+          <!-- Role Selector -->
+          <div>
+            <label class="block text-sm font-semibold text-slate-200 mb-2">1. Choose Target Career</label>
+            <select id="gap-role-select" onchange="onRoleSelectionChanged()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="role-1">Full-Stack Developer</option>
+              <option value="role-2">Data Analyst</option>
+              <option value="role-3">AI Engineer</option>
+            </select>
+          </div>
+
+          <!-- Existing Skills Checklist -->
+          <div>
+            <label class="block text-sm font-semibold text-slate-200 mb-2">2. Check Off Skills You Already Know</label>
+            <p class="text-xs text-slate-400 mb-3">Click on any skill pill to toggle your proficiency:</p>
+            <div id="skill-pills-container" class="flex flex-wrap gap-2 max-h-48 overflow-y-auto p-1 border border-slate-800/80 rounded-xl bg-slate-950/40">
+              <!-- Dynamically populated skill toggles -->
+            </div>
+          </div>
+
+          <!-- Custom Skill Add -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Add Another Skill (Optional)</label>
+            <div class="flex gap-2">
+              <input type="text" id="custom-skill-input" placeholder="e.g. Next.js, Kubernetes, Tableau..." class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <button onclick="addCustomSkill()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white rounded-xl text-sm font-medium transition">Add</button>
+            </div>
+          </div>
+
+          <button onclick="runSkillGapAnalysis()" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 transition">
+            <i data-lucide="sparkles" class="w-4 h-4"></i> Run Skill-Gap Analysis
+          </button>
+        </div>
+
+        <!-- Right Column: Analysis Results -->
+        <div class="lg:col-span-6 bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between" id="gap-results-panel">
+          <div class="space-y-6">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+              <div>
+                <h3 class="font-bold text-lg text-white" id="gap-result-title">Full-Stack Developer Readiness</h3>
+                <span class="text-xs text-slate-400">PostgreSQL Verified Comparison</span>
+              </div>
+              <div id="gap-percent-badge" class="px-3.5 py-1.5 rounded-full text-base font-extrabold bg-indigo-950 border border-indigo-700 text-indigo-300">
+                0% Match
+              </div>
+            </div>
+
+            <!-- Explanation Callout -->
+            <div id="gap-explanation" class="p-4 rounded-xl bg-slate-800/70 border border-slate-700 text-sm text-slate-300">
+              Select your known skills on the left to compute your match percentage and discover your curriculum gaps.
+            </div>
+
+            <!-- Matched Skills -->
+            <div class="space-y-2">
+              <div class="text-xs font-semibold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                <i data-lucide="check-circle" class="w-4 h-4"></i> Matched Skills (<span id="matched-count">0</span>)
+              </div>
+              <div id="matched-skills-list" class="flex flex-wrap gap-2 text-sm text-slate-400 italic">
+                None selected yet.
+              </div>
+            </div>
+
+            <!-- Missing Skills -->
+            <div class="space-y-2">
+              <div class="text-xs font-semibold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
+                <i data-lucide="alert-circle" class="w-4 h-4"></i> Skills to Learn (<span id="missing-count">0</span>)
+              </div>
+              <div id="missing-skills-list" class="flex flex-wrap gap-2 text-sm text-slate-400 italic">
+                All skills required.
+              </div>
+            </div>
+          </div>
+
+          <!-- Action to Roadmap -->
+          <div class="pt-6 border-t border-slate-800 mt-6">
+            <button onclick="generateRoadmapFromGap()" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 transition">
+              <i data-lucide="map-pin" class="w-4 h-4"></i> View Custom Learning Roadmap &rarr;
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- 4. ROADMAP VIEW -->
+    <!-- ========================================== -->
+    <section id="view-roadmap" class="space-y-8 hidden animate-fade-in">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-800 pb-5 gap-4">
+        <div>
+          <h2 class="text-2xl font-bold text-white" id="roadmap-heading">Personalized Learning Roadmap</h2>
+          <p class="text-slate-400 text-sm mt-1" id="roadmap-subheading">Step-by-step milestones to acquire your missing skills.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="openSaveProfileModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition">
+            <i data-lucide="save" class="w-4 h-4"></i> Save Student Profile
+          </button>
+        </div>
+      </div>
+
+      <!-- Roadmap Stats -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 text-center">
+          <div class="text-xs text-slate-400">Total Skills</div>
+          <div id="rm-stat-total" class="text-2xl font-bold text-white mt-1">7</div>
+        </div>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 text-center">
+          <div class="text-xs text-slate-400">Acquired</div>
+          <div id="rm-stat-acquired" class="text-2xl font-bold text-emerald-400 mt-1">2</div>
+        </div>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 text-center">
+          <div class="text-xs text-slate-400">Missing Steps</div>
+          <div id="rm-stat-missing" class="text-2xl font-bold text-rose-400 mt-1">5</div>
+        </div>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 text-center">
+          <div class="text-xs text-slate-400">Completed</div>
+          <div id="rm-stat-completed" class="text-2xl font-bold text-cyan-400 mt-1">0%</div>
+        </div>
+      </div>
+
+      <!-- Steps List Container -->
+      <div id="roadmap-steps-container" class="space-y-4">
+        <!-- Dynamically rendered step cards -->
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- 5. AI CAREER CHATBOT VIEW -->
+    <!-- ========================================== -->
+    <section id="view-chat" class="space-y-6 hidden animate-fade-in">
+      <div class="border-b border-slate-800 pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="bot" class="w-6 h-6 text-cyan-400"></i> AI Career & Skill Mentor
+          </h2>
+          <p class="text-slate-400 text-sm mt-1">Ask questions about career paths, interview prep, project ideas, or skill roadmaps.</p>
+        </div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs text-slate-400">
+          <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+          <span id="chat-mode-label">Pathify Expert Intelligence</span>
+        </div>
+      </div>
+
+      <!-- Chat Container -->
+      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl flex flex-col h-[580px] overflow-hidden">
+        <!-- Message History -->
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+          <!-- Initial bot message -->
+          <div class="flex items-start gap-3 max-w-2xl">
+            <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0">
+              <i data-lucide="bot" class="w-5 h-5 text-white"></i>
+            </div>
+            <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl rounded-tl-none p-4 text-sm text-slate-200 leading-relaxed shadow-sm">
+              👋 <strong>Hi! I am Pathify-AI, your career mentor.</strong><br><br>
+              Whether you are preparing to become a <strong>Full-Stack Developer</strong>, <strong>Data Analyst</strong>, or <strong>AI Engineer</strong>, I can help you understand the skills required, suggest portfolio projects, and plan your study milestones.<br><br>
+              Click any suggestion below or type your question:
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Prompts Row -->
+        <div class="px-4 py-2 bg-slate-950/60 border-t border-slate-800/80 flex flex-wrap gap-2">
+          <button onclick="sendQuickPrompt('What are the core skills for an AI Engineer?')" class="text-xs px-3 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-indigo-900/50 transition">
+            🤖 AI Engineer Skills
+          </button>
+          <button onclick="sendQuickPrompt('How do I build a portfolio as a Data Analyst?')" class="text-xs px-3 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-900/50 transition">
+            📊 Data Analyst Projects
+          </button>
+          <button onclick="sendQuickPrompt('What is the best roadmap to learn Full-Stack Web Development?')" class="text-xs px-3 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-900/50 transition">
+            💻 Full-Stack Roadmap
+          </button>
+          <button onclick="sendQuickPrompt('How do I prepare for tech coding interviews?')" class="text-xs px-3 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-900/50 transition">
+            🎯 Interview Prep
+          </button>
+        </div>
+
+        <!-- Input Bar -->
+        <form onsubmit="handleChatSubmit(event)" class="p-3 bg-slate-900 border-t border-slate-800 flex gap-2">
+          <input type="text" id="chat-input" placeholder="Ask about tech skills, career roadmaps, or interview advice..." class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <button type="submit" id="chat-send-btn" class="px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-semibold flex items-center gap-1.5 transition">
+            <span>Send</span>
+            <i data-lucide="send" class="w-4 h-4"></i>
+          </button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Save Profile Modal -->
+  <div id="profile-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i data-lucide="user-plus" class="w-5 h-5 text-indigo-400"></i> Save Student Profile
+        </h3>
+        <button onclick="closeSaveProfileModal()" class="text-slate-400 hover:text-white">&times;</button>
+      </div>
+      <p class="text-xs text-slate-400">
+        Persist this profile and its target roadmap into your local PostgreSQL database (<code class="text-indigo-300">pathify_db</code>).
+      </p>
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Student Name</label>
+          <input type="text" id="modal-name" value="Demo Student" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Education Background</label>
+          <input type="text" id="modal-edu" value="B.Tech Computer Science" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeSaveProfileModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm">Cancel</button>
+        <button onclick="confirmSaveProfile()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl text-sm flex items-center gap-1.5">
+          <i data-lucide="check" class="w-4 h-4"></i> Save to Database
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm shadow-xl flex items-center gap-2 transform translate-y-20 opacity-0 transition duration-300">
+    <i data-lucide="info" class="w-4 h-4 text-indigo-400" id="toast-icon"></i>
+    <span id="toast-msg">Notification</span>
+  </div>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800/80 bg-slate-950/80 py-6 text-center text-xs text-slate-500">
+    Pathify-AI Prototype &copy; 2026. Built with FastAPI, PostgreSQL, and SQLAlchemy.
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

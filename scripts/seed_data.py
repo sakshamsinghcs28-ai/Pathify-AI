@@ -1,7 +1,10 @@
 """Database seed script for Pathify-AI.
 
 Populates initial sample career roles, required skills, and learning roadmap templates
-matching the contracts in API.md.
+matching the contracts in API.md and prototype requirements:
+1. Full-Stack Developer
+2. Data Analyst
+3. AI Engineer
 """
 import asyncio
 import sys
@@ -20,7 +23,7 @@ from database.models import CareerRole, Skill, CareerSkillRequirement, LearningR
 ROLES_DATA = [
     {
         "slug": "role-1",
-        "title": "Full-Stack Web Developer",
+        "title": "Full-Stack Developer",
         "industry": "Software Development",
         "description": "Builds both user-facing frontends and backend servers/APIs for modern web applications.",
         "skills": [
@@ -35,29 +38,32 @@ ROLES_DATA = [
     },
     {
         "slug": "role-2",
-        "title": "Frontend Specialist",
-        "industry": "Software Development",
-        "description": "Specializes in building responsive, accessible, and high-performance user interfaces.",
+        "title": "Data Analyst",
+        "industry": "Data & Analytics",
+        "description": "Transforms raw enterprise data into actionable insights, dashboards, and executive reports.",
         "skills": [
-            ("HTML & CSS", "Master semantic HTML markup, responsive web design with Flexbox and CSS Grid.", "Build a responsive multi-page personal portfolio site from scratch without frameworks.", "1-2 weeks"),
-            ("JavaScript", "Master ES6+ JavaScript syntax, asynchronous patterns, and modern DOM APIs.", "Build an interactive client-side application with dynamic state management.", "1-2 weeks"),
-            ("TypeScript", "Apply static typing, interfaces, generics, and strict TypeScript compiler settings.", "Refactor a JavaScript project to TypeScript with zero compiler errors.", "2 weeks"),
-            ("React", "Learn component lifecycle, hooks, context API, and single-page application routing.", "Develop a full-featured dashboard with client-side state and component reusability.", "2-3 weeks"),
-            ("Tailwind CSS", "Build responsive modern interfaces using utility-first CSS and component abstractions.", "Design a mobile-first responsive landing page with dark mode support.", "1 week"),
-            ("Git & GitHub", "Learn version control workflows, branching strategies, merge conflicts, and pull requests.", "Manage code repositories using feature branches, pull requests, and commit hygiene.", "1 week"),
+            ("SQL & Relational Databases", "Master SQL queries, window functions, multi-table joins, and data aggregations.", "Write analytical queries across complex transactional datasets to calculate retention metrics.", "2-3 weeks"),
+            ("Python", "Learn Python fundamentals, data manipulation syntax, and standard libraries.", "Automate data extraction and basic report generation using Python scripts.", "2 weeks"),
+            ("Data Cleaning with Pandas", "Clean messy datasets, handle missing values, reshape dataframes, and perform vector calculations.", "Clean and normalize an untidy real-world CSV dataset with thousands of records.", "2 weeks"),
+            ("Statistics & Exploratory Data Analysis", "Apply descriptive statistics, hypothesis testing, distributions, and correlation analysis.", "Conduct an in-depth exploratory analysis discovering key correlations in business metrics.", "2 weeks"),
+            ("Power BI / Tableau", "Build interactive business intelligence dashboards with dynamic filters and drill-downs.", "Develop an executive sales and customer cohort retention dashboard.", "1-2 weeks"),
+            ("Excel & Spreadsheets", "Master Pivot Tables, advanced lookup formulas (XLOOKUP), and data modeling in spreadsheets.", "Build a multi-tab financial forecast model using dynamic formulas and conditional formatting.", "1 week"),
+            ("Git & GitHub", "Learn version control workflows, branching strategies, and reproducible analysis notebooks.", "Track analysis notebooks and script versions using Git and GitHub.", "1 week"),
         ],
     },
     {
         "slug": "role-3",
-        "title": "Backend & Cloud Engineer",
-        "industry": "Software Development",
-        "description": "Architects scalable APIs, database schemas, and cloud deployment pipelines.",
+        "title": "AI Engineer",
+        "industry": "Artificial Intelligence & ML",
+        "description": "Develops, fine-tunes, and deploys intelligent models, LLM agents, and machine learning pipelines into production.",
         "skills": [
-            ("Python", "Master Python 3 fundamentals, data structures, OOP, and asynchronous programming.", "Write modular Python packages with type annotations and unit tests.", "2 weeks"),
-            ("SQL & Relational Databases", "Master relational modeling, ACID transactions, complex joins, and query optimization.", "Design and optimize a normalized relational schema with indexing.", "2 weeks"),
-            ("Docker", "Containerize services, create multi-stage builds, and manage local multi-container setups.", "Containerize backend services with Docker Compose for local development.", "1-2 weeks"),
-            ("AWS / Cloud Basics", "Understand cloud computing models, virtual servers, managed databases, and IAM.", "Deploy a containerized API on a cloud provider with environment secrets.", "2-3 weeks"),
-            ("Git & GitHub", "Learn version control workflows, branching strategies, merge conflicts, and pull requests.", "Manage code repositories using feature branches, pull requests, and commit hygiene.", "1 week"),
+            ("Python", "Master Python 3 fundamentals, asynchronous concurrency, and performance optimization.", "Write modular, object-oriented Python packages for ML pipelines.", "2 weeks"),
+            ("Machine Learning Algorithms (Scikit-Learn)", "Understand supervised and unsupervised learning, cross-validation, and hyperparameter tuning.", "Train, evaluate, and tune regression and classification models on structured datasets.", "2-3 weeks"),
+            ("Deep Learning & PyTorch", "Understand neural network architectures (CNNs, Transformers), loss functions, and backpropagation.", "Build and train a custom neural network using PyTorch with GPU acceleration.", "3-4 weeks"),
+            ("Natural Language Processing (NLP) & LLMs", "Learn tokenization, embeddings, prompt engineering, fine-tuning, and transformer attention mechanisms.", "Implement an autonomous agent or text-processing pipeline using modern LLM APIs.", "2-3 weeks"),
+            ("Vector Databases & RAG", "Master semantic embeddings, vector indexing (Chroma, Pinecone, FAISS), and Retrieval-Augmented Generation.", "Build a production RAG system that answers questions over custom enterprise documentation.", "2 weeks"),
+            ("Model Deployment & FastAPI", "Serve machine learning models via high-throughput, low-latency REST APIs.", "Deploy an ML inference service with Docker, FastAPI, and asynchronous batching.", "1-2 weeks"),
+            ("Docker & MLOps Basics", "Containerize inference workloads, monitor model drift, and automate pipelines.", "Containerize an AI service and orchestrate it with Docker Compose.", "1-2 weeks"),
         ],
     },
 ]
@@ -95,9 +101,9 @@ async def seed():
             # Ensure all skills exist
             for skill_name, goal, task, duration in role_spec["skills"]:
                 key = skill_name.lower()
+                desc = f"Goal: {goal} | Task: {task} | Duration: {duration}"
                 if key not in existing_skills:
                     skill_slug = key.replace(" ", "-").replace("&", "and").replace("/", "-")
-                    desc = f"Goal: {goal} | Task: {task} | Duration: {duration}"
                     skill = Skill(
                         slug=skill_slug,
                         name=skill_name,
@@ -109,6 +115,7 @@ async def seed():
                     existing_skills[key] = skill
                 else:
                     skill = existing_skills[key]
+                    skill.description = desc  # update description with goal/task/duration
 
                 # Ensure requirement mapping exists
                 req_res = await session.execute(
