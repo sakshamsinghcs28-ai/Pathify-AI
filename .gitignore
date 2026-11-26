@@ -243,3 +243,13 @@ __pycache__/
 # Operating system files
 .DS_Store
 Thumbs.db
+
+# Runtime storage, user uploads, generated reports, and temporary files
+uploads/
+backend/uploads/
+storage/
+backend/storage/
+temp/
+tmp/
+reports/
+exports/

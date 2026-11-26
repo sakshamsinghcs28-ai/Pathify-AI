@@ -205,9 +205,163 @@ Example response (200 OK, abbreviated to one step):
 
 The actual response has one step per missing skill. Returns 404 if the profile or its role is not found.
 
+### 8. User Registration
+
+POST /api/auth/register
+
+Request body:
+
+```json
+{
+  "full_name": "Alex Chen",
+  "email": "alex.chen@example.com",
+  "password": "SecurePassword123!",
+  "confirm_password": "SecurePassword123!"
+}
+```
+
+Example response (201 Created):
+
+```json
+{
+  "success": true,
+  "message": "Registration successful",
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "bearer",
+  "user": {
+    "id": "184b4cf0-f661-463d-82d1-d2ea1e7c5ab0",
+    "email": "alex.chen@example.com",
+    "role": "student",
+    "is_active": true,
+    "full_name": "Alex Chen",
+    "education": null,
+    "created_at": "2026-11-11T08:30:00Z"
+  }
+}
+```
+
+### 9. User Login
+
+POST /api/auth/login
+
+Request body:
+
+```json
+{
+  "email": "alex.chen@example.com",
+  "password": "SecurePassword123!"
+}
+```
+
+Example response (200 OK):
+
+```json
+{
+  "success": true,
+  "message": "Login successful",
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "bearer",
+  "user": {
+    "id": "184b4cf0-f661-463d-82d1-d2ea1e7c5ab0",
+    "email": "alex.chen@example.com",
+    "role": "student",
+    "is_active": true,
+    "full_name": "Alex Chen",
+    "education": null,
+    "created_at": "2026-11-11T08:30:00Z"
+  }
+}
+```
+
+### 10. Current User Profile
+
+GET /api/auth/me
+
+Header: `Authorization: Bearer <access_token>`
+
+Example response (200 OK):
+
+```json
+{
+  "success": true,
+  "user": {
+    "id": "184b4cf0-f661-463d-82d1-d2ea1e7c5ab0",
+    "email": "alex.chen@example.com",
+    "role": "student",
+    "is_active": true,
+    "full_name": "Alex Chen",
+    "education": null,
+    "created_at": "2026-11-11T08:30:00Z"
+  }
+}
+```
+
+### 11. Forgot Password
+
+POST /api/auth/forgot-password
+
+Request body:
+
+```json
+{
+  "email": "alex.chen@example.com"
+}
+```
+
+Example response (200 OK):
+
+```json
+{
+  "success": true,
+  "message": "A password reset link has been dispatched to your email address (alex.chen@example.com). Please check your inbox."
+}
+```
+
+Returns 404 if the email is not registered, or 500/502 if Resend API configuration is missing or dispatch fails.
+
+### 12. Verify Reset Token
+
+GET /api/auth/verify-reset-token?token={token}
+
+Example response (200 OK):
+
+```json
+{
+  "valid": true,
+  "message": "Password reset token is valid."
+}
+```
+
+Returns 400 if token is invalid, expired (> 20 min), or already used.
+
+### 13. Reset Password
+
+POST /api/auth/reset-password
+
+Request body:
+
+```json
+{
+  "token": "dGVzdC1yZXNldC10b2tlbi...",
+  "password": "NewSecurePassword123!",
+  "confirm_password": "NewSecurePassword123!"
+}
+```
+
+Example response (200 OK):
+
+```json
+{
+  "success": true,
+  "message": "Your password has been successfully reset. You can now log in with your new password."
+}
+```
+
+Returns 400 if passwords do not match or token is invalid/expired/used. Updates the password securely using bcrypt in PostgreSQL.
+
 ## Frontend integration notes
 
 - During local development, call the API at http://localhost:5000.
 - Send JSON request bodies for POST routes and parse the JSON responses.
+- Store the JWT `access_token` in client-side storage (e.g. `localStorage`) and send it as `Authorization: Bearer <token>` for authenticated routes.
 - Keep the UUID returned by POST /api/profiles for the profile detail, skill-gap, and roadmap routes.
-- These endpoints currently have no login/authentication and do not persist profiles in MongoDB.

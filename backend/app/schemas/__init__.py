@@ -9,6 +9,18 @@ from .profiles import (
     ProfileSkillGapResponse,
 )
 from .roadmap import RoadmapStep, RoadmapSummary, ProfileRoadmapResponse
+from .auth import (
+    UserRegisterRequest,
+    UserLoginRequest,
+    UserResponse,
+    TokenResponse,
+    AuthMeResponse,
+    ForgotPasswordRequest,
+    ForgotPasswordResponse,
+    VerifyResetTokenResponse,
+    ResetPasswordRequest,
+    ResetPasswordResponse,
+)
 
 __all__ = [
     "HealthResponse",
@@ -25,4 +37,14 @@ __all__ = [
     "RoadmapStep",
     "RoadmapSummary",
     "ProfileRoadmapResponse",
+    "UserRegisterRequest",
+    "UserLoginRequest",
+    "UserResponse",
+    "TokenResponse",
+    "AuthMeResponse",
+    "ForgotPasswordRequest",
+    "ForgotPasswordResponse",
+    "VerifyResetTokenResponse",
+    "ResetPasswordRequest",
+    "ResetPasswordResponse",
 ]

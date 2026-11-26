@@ -1,21 +1,92 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
+/* ========================================================
+   CSS Variables & Theme Definitions
+   ======================================================== */
 :root {
   --primary: #4f46e5;
   --primary-hover: #4338ca;
   --secondary: #06b6d4;
   --bg-dark: #0f172a;
   --card-dark: #1e293b;
+
+  /* Theme Color Tokens - Dark Mode (Default) */
+  --bg-body: #0b0f19;
+  --bg-surface: rgba(15, 23, 42, 0.7);
+  --bg-card: rgba(15, 23, 42, 0.6);
+  --bg-card-hover: rgba(30, 41, 59, 0.8);
+  --bg-card-alt: #0f172a;
+  --bg-elevated: #1e293b;
+  --bg-input: rgba(2, 6, 23, 0.8);
+  --border-card: #1e293b;
+  --border-card-subtle: rgba(30, 41, 59, 0.8);
+  --border-input: #334155;
+  --text-title: #ffffff;
+  --text-body: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-subtle: #64748b;
+  --header-bg: rgba(15, 23, 42, 0.85);
+  --header-border: #1e293b;
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --theme-transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                      color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                      border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                      box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Light Mode Variables (WCAG AA Compliant Palette) */
+html.light {
+  /* Main background: Soft light grey */
+  --bg-body: #F5F7FB;
+  /* Cards and containers: Pure white */
+  --bg-surface: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #F8FAFC;
+  --bg-card-alt: #F5F7FB;
+  --bg-elevated: #EEF2FF;
+  --bg-input: #FFFFFF;
+
+  /* Borders: Light grey */
+  --border-card: #DCE3EE;
+  --border-card-subtle: #E2E8F0;
+  --border-input: #DCE3EE;
+
+  /* Typography: Dark navy & slate greys */
+  --text-title: #172033;
+  --text-body: #475569;
+  --text-muted: #64748B;
+  --text-subtle: #94A3B8;
+
+  /* Primary Button: Deep purple & White text */
+  --primary-btn: #5B45E8;
+  --primary-btn-hover: #4A36D4;
+  --primary-btn-text: #FFFFFF;
+
+  /* Secondary Button: White & Dark text */
+  --secondary-btn: #FFFFFF;
+  --secondary-btn-hover: #F1F5F9;
+  --secondary-btn-border: #DCE3EE;
+  --secondary-btn-text: #172033;
+
+  /* Header & Shadows */
+  --header-bg: rgba(255, 255, 255, 0.96);
+  --header-border: #DCE3EE;
+  --card-shadow: 0 4px 16px -2px rgba(23, 32, 51, 0.06);
 }
 
 body {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  background-color: #0b0f19;
+  background-color: var(--bg-body);
   color: #f1f5f9;
 }
 
 code, pre {
   font-family: 'JetBrains Mono', monospace;
+}
+
+/* Smooth Theme Transitions */
+body, header, nav, main, section, div, button, input, select, textarea, form, span {
+  transition: var(--theme-transition);
 }
 
 /* Custom Scrollbar */
@@ -52,4 +123,961 @@ code, pre {
 
 .pulse-badge {
   animation: softPulse 3s infinite ease-in-out;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Custom Auth Card Accents */
+.auth-input-valid {
+  border-color: #10b981 !important;
+}
+
+.auth-input-invalid {
+  border-color: #f43f5e !important;
+}
+
+/* ========================================================
+   LIGHT MODE STYLING OVERRIDES (Scoped exclusively to html.light)
+   ======================================================== */
+
+html.light body {
+  background-color: var(--bg-body) !important;
+  color: var(--text-body) !important;
+}
+
+/* 1. Complete Text Refinement & Headings */
+html.light h1,
+html.light h2,
+html.light h3,
+html.light h4,
+html.light h5,
+html.light h6 {
+  color: var(--text-title) !important;
+}
+
+html.light p {
+  color: var(--text-body) !important;
+}
+
+/* Scoped class-based typography */
+html.light .text-white:not(button):not([class*="bg-indigo"]):not([class*="from-indigo"]):not([class*="bg-emerald"]):not([class*="from-emerald"]):not([class*="bg-rose"]):not([class*="bg-cyan"]):not(#auth-user-avatar):not(.badge-solid) {
+  color: var(--text-title) !important;
+}
+
+html.light .text-slate-100 {
+  color: var(--text-title) !important;
+}
+
+html.light .text-slate-200 {
+  color: #1E293B !important;
+}
+
+html.light .text-slate-300 {
+  color: #334155 !important;
+}
+
+html.light .text-slate-400 {
+  color: #475569 !important;
+}
+
+html.light .text-slate-500 {
+  color: #64748B !important;
+}
+
+/* High-Contrast Gradient Headings in Light Mode */
+html.light .bg-clip-text {
+  background-image: linear-gradient(135deg, #4338CA 0%, #0369A1 50%, #047857 100%) !important;
+  -webkit-background-clip: text !important;
+  color: transparent !important;
+}
+
+html.light header .bg-clip-text {
+  background-image: linear-gradient(135deg, #172033 0%, #312E81 50%, #5B45E8 100%) !important;
+  -webkit-background-clip: text !important;
+  color: transparent !important;
+}
+
+/* 2. Header, Navbar & Mobile Navigation */
+html.light header {
+  background-color: var(--header-bg) !important;
+  border-color: var(--header-border) !important;
+  box-shadow: 0 1px 4px rgba(23, 32, 51, 0.05) !important;
+}
+
+html.light .md\:hidden.bg-slate-900 {
+  background-color: #FFFFFF !important;
+  border-color: #DCE3EE !important;
+  box-shadow: 0 -1px 3px rgba(23, 32, 51, 0.03);
+}
+
+html.light .nav-btn {
+  color: #475569 !important;
+}
+
+html.light .nav-btn:hover {
+  color: #172033 !important;
+  background-color: #F1F5F9 !important;
+}
+
+html.light .nav-btn.text-indigo-400 {
+  color: #5B45E8 !important;
+  background-color: #EEF2FF !important;
+  border: 1px solid #C7D2FE !important;
+  font-weight: 600;
+}
+
+/* Prototype Demo Nav Badge */
+html.light .bg-indigo-900\/60 {
+  background-color: #EEF2FF !important;
+  border-color: #C7D2FE !important;
+  color: #4338CA !important;
+}
+
+/* Health Badge */
+html.light #health-badge {
+  background-color: #ECFDF5 !important;
+  border-color: #A7F3D0 !important;
+  color: #047857 !important;
+}
+
+html.light #health-badge.bg-rose-950\/80 {
+  background-color: #FEF2F2 !important;
+  border-color: #FECACA !important;
+  color: #B91C1C !important;
+}
+
+html.light #health-badge.bg-slate-800\/80 {
+  background-color: #F1F5F9 !important;
+  border-color: #CBD5E1 !important;
+  color: #64748B !important;
+}
+
+html.light #health-badge span.bg-emerald-400 {
+  background-color: #059669 !important;
+}
+
+html.light #health-badge span.bg-rose-400 {
+  background-color: #DC2626 !important;
+}
+
+html.light #health-badge span.bg-slate-400 {
+  background-color: #94A3B8 !important;
+}
+
+/* Logged-In User Navigation Chip */
+html.light #auth-nav-logged-in .bg-slate-800\/80 {
+  background-color: #F8FAFC !important;
+  border-color: #DCE3EE !important;
+}
+
+html.light #auth-user-name {
+  color: #172033 !important;
+}
+
+html.light #auth-user-role {
+  color: #5B45E8 !important;
+}
+
+html.light #auth-user-avatar {
+  background: linear-gradient(135deg, #5B45E8, #0284C7) !important;
+  color: #FFFFFF !important;
+}
+
+/* Mobile Nav items */
+html.light .md\:hidden button.text-slate-400 {
+  color: #475569 !important;
+}
+html.light .md\:hidden button.text-slate-400:hover {
+  color: #5B45E8 !important;
+}
+html.light .md\:hidden button.text-indigo-400 {
+  color: #5B45E8 !important;
+  font-weight: 700;
+}
+
+/* 3. Base Cards, Panels & Dividers */
+html.light .bg-slate-900,
+html.light .bg-slate-900\/60,
+html.light .bg-slate-900\/70,
+html.light .bg-slate-900\/80,
+html.light .bg-slate-900\/90 {
+  background-color: #FFFFFF !important;
+  border-color: #DCE3EE !important;
+  box-shadow: var(--card-shadow) !important;
+}
+
+html.light .bg-slate-950,
+html.light .bg-slate-950\/40,
+html.light .bg-slate-950\/60,
+html.light .bg-slate-950\/80 {
+  background-color: #F8FAFC !important;
+  border-color: #DCE3EE !important;
+}
+
+html.light .bg-slate-800,
+html.light .bg-slate-800\/60,
+html.light .bg-slate-800\/70,
+html.light .bg-slate-800\/80 {
+  background-color: #F8FAFC !important;
+  border-color: #DCE3EE !important;
+}
+
+html.light .border-slate-800,
+html.light .border-slate-800\/60,
+html.light .border-slate-800\/80,
+html.light .border-slate-700,
+html.light .border-slate-700\/50,
+html.light .border-slate-700\/60 {
+  border-color: #DCE3EE !important;
+}
+
+/* 4. Primary, Secondary & State Buttons */
+
+/* Primary Buttons: Deep purple with White text */
+html.light button.bg-indigo-600,
+html.light button.bg-indigo-500,
+html.light [class*="bg-indigo-600"],
+html.light button[class*="from-indigo-600"],
+html.light #login-submit-btn {
+  background-color: #5B45E8 !important;
+  background-image: none !important;
+  color: #FFFFFF !important;
+  border: 1px solid #4A36D4 !important;
+  box-shadow: 0 4px 14px rgba(91, 69, 232, 0.25) !important;
+}
+
+html.light button.bg-indigo-600:hover,
+html.light button.bg-indigo-500:hover,
+html.light [class*="bg-indigo-600"]:hover,
+html.light button[class*="from-indigo-600"]:hover,
+html.light #login-submit-btn:hover {
+  background-color: #4A36D4 !important;
+  border-color: #3726B8 !important;
+}
+
+html.light button.bg-indigo-600 *,
+html.light button.bg-indigo-500 *,
+html.light [class*="bg-indigo-600"] *,
+html.light button[class*="from-indigo-600"] *,
+html.light #login-submit-btn * {
+  color: #FFFFFF !important;
+}
+
+/* Secondary Buttons: Pure White background, Dark text, subtle border */
+html.light button.bg-slate-800,
+html.light button.bg-slate-800\/80,
+html.light #auth-nav-logged-out button:first-child,
+html.light #view-dashboard button.bg-slate-800,
+html.light #view-dashboard button.bg-slate-800\/80,
+html.light #profile-modal button.bg-slate-800,
+html.light #view-roadmap button.bg-slate-800 {
+  background-color: #FFFFFF !important;
+  border: 1px solid #DCE3EE !important;
+  color: #172033 !important;
+  box-shadow: 0 1px 3px rgba(23, 32, 51, 0.05) !important;
+}
+
+html.light button.bg-slate-800:hover,
+html.light button.bg-slate-800\/80:hover,
+html.light #auth-nav-logged-out button:first-child:hover,
+html.light #view-dashboard button.bg-slate-800:hover,
+html.light #profile-modal button.bg-slate-800:hover,
+html.light #view-roadmap button.bg-slate-800:hover {
+  background-color: #F1F5F9 !important;
+  border-color: #CBD5E1 !important;
+  color: #0F172A !important;
+}
+
+html.light button.bg-slate-800 *,
+html.light button.bg-slate-800\/80 *,
+html.light #auth-nav-logged-out button:first-child * {
+  color: inherit !important;
+}
+
+/* Specific button icons */
+html.light #auth-nav-logged-out button:first-child i {
+  color: #5B45E8 !important;
+}
+
+html.light #view-dashboard button.bg-slate-800 i.text-cyan-400 {
+  color: #0284C7 !important;
+}
+
+html.light #view-dashboard button.bg-slate-800\/80 i.text-emerald-400 {
+  color: #059669 !important;
+}
+
+/* Career Card "Analyze Skill Gap" Button in Dashboard Grid */
+html.light #dashboard-roles-grid button {
+  background-color: #FFFFFF !important;
+  border: 1px solid #DCE3EE !important;
+  color: #172033 !important;
+  box-shadow: 0 1px 3px rgba(23, 32, 51, 0.05) !important;
+}
+
+html.light #dashboard-roles-grid button:hover {
+  background-color: #5B45E8 !important;
+  border-color: #4A36D4 !important;
+  color: #FFFFFF !important;
+}
+
+html.light #dashboard-roles-grid button:hover * {
+  color: #FFFFFF !important;
+}
+
+/* Top Nav Register button */
+html.light #auth-nav-logged-out button:last-child {
+  background-color: #5B45E8 !important;
+  background-image: none !important;
+  color: #FFFFFF !important;
+  border: 1px solid #4A36D4 !important;
+}
+
+html.light #auth-nav-logged-out button:last-child:hover {
+  background-color: #4A36D4 !important;
+}
+
+html.light #auth-nav-logged-out button:last-child * {
+  color: #FFFFFF !important;
+}
+
+/* Register primary submit button */
+html.light #register-submit-btn {
+  background-image: linear-gradient(135deg, #059669 0%, #0D9488 50%, #0284C7 100%) !important;
+  color: #FFFFFF !important;
+}
+
+html.light #register-submit-btn:hover {
+  background-image: linear-gradient(135deg, #047857 0%, #0F766E 50%, #0369A1 100%) !important;
+}
+
+html.light #register-submit-btn * {
+  color: #FFFFFF !important;
+}
+
+/* Disabled buttons */
+html.light button:disabled,
+html.light button[disabled] {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+}
+
+/* 5. Form Inputs, Labels & Placeholders */
+html.light input[type="text"],
+html.light input[type="email"],
+html.light input[type="password"],
+html.light select,
+html.light textarea {
+  background-color: #FFFFFF !important;
+  border: 1px solid #DCE3EE !important;
+  color: #172033 !important;
+}
+
+html.light input::placeholder,
+html.light textarea::placeholder {
+  color: #94A3B8 !important;
+}
+
+html.light input:focus,
+html.light select:focus,
+html.light textarea:focus {
+  border-color: #5B45E8 !important;
+  box-shadow: 0 0 0 3px rgba(91, 69, 232, 0.18) !important;
+  outline: none !important;
+}
+
+html.light label {
+  color: #172033 !important;
+}
+
+html.light .relative .text-slate-400 {
+  color: #64748B !important;
+}
+
+html.light .relative button:hover {
+  color: #172033 !important;
+}
+
+html.light input[type="checkbox"] {
+  background-color: #FFFFFF !important;
+  border-color: #CBD5E1 !important;
+  accent-color: #5B45E8 !important;
+}
+
+/* 6. Dashboard Hero Banner & Metrics */
+html.light #view-dashboard .relative.overflow-hidden.rounded-3xl.bg-gradient-to-b {
+  background: linear-gradient(135deg, #EEF2FF 0%, #FFFFFF 55%, #F0FDF4 100%) !important;
+  border-color: #DCE3EE !important;
+  box-shadow: 0 10px 30px -5px rgba(91, 69, 232, 0.07);
+}
+
+html.light #view-dashboard .inline-flex.bg-indigo-500\/10 {
+  background-color: #EEF2FF !important;
+  border-color: #C7D2FE !important;
+  color: #4338CA !important;
+}
+
+/* Stat card icon wrappers */
+html.light .w-10.h-10.bg-indigo-500\/10,
+html.light .w-12.h-12.bg-indigo-500\/10,
+html.light .bg-indigo-500\/10 {
+  background-color: #EEF2FF !important;
+  border-color: #C7D2FE !important;
+  color: #5B45E8 !important;
+}
+
+html.light .w-12.h-12.bg-cyan-500\/10,
+html.light .bg-cyan-500\/10 {
+  background-color: #ECFEFF !important;
+  border-color: #A5F3FC !important;
+  color: #0284C7 !important;
+}
+
+html.light .w-12.h-12.bg-emerald-500\/10,
+html.light .bg-emerald-500\/10 {
+  background-color: #ECFDF5 !important;
+  border-color: #A7F3D0 !important;
+  color: #059669 !important;
+}
+
+html.light .w-9.h-9.bg-purple-500\/10,
+html.light .bg-purple-500\/10 {
+  background-color: #FAF5FF !important;
+  border-color: #E9D5FF !important;
+  color: #7E22CE !important;
+}
+
+/* 7. Career Role Cards */
+html.light #careers-roles-container .bg-slate-900\/70,
+html.light #dashboard-roles-grid .bg-slate-900\/60 {
+  background-color: #FFFFFF !important;
+  border-color: #DCE3EE !important;
+  box-shadow: var(--card-shadow) !important;
+}
+
+html.light #careers-roles-container .bg-slate-900\/70:hover,
+html.light #dashboard-roles-grid .bg-slate-900\/60:hover {
+  border-color: #A5B4FC !important;
+  box-shadow: 0 10px 25px -5px rgba(91, 69, 232, 0.12) !important;
+}
+
+/* Category Badges */
+html.light .bg-indigo-950,
+html.light .bg-indigo-950\/60,
+html.light .bg-indigo-950\/80 {
+  background-color: #EEF2FF !important;
+  border-color: #C7D2FE !important;
+  color: #4338CA !important;
+}
+
+/* Required skill pills in career cards */
+html.light span.bg-slate-800,
+html.light span.bg-slate-800\/80 {
+  background-color: #F8FAFC !important;
+  border: 1px solid #DCE3EE !important;
+  color: #334155 !important;
+}
+
+/* 8. Skill Gap Analysis Section */
+html.light #skill-pills-container {
+  background-color: #F8FAFC !important;
+  border-color: #DCE3EE !important;
+}
+
+html.light #skill-pills-container button.bg-slate-800 {
+  background-color: #FFFFFF !important;
+  border: 1px solid #DCE3EE !important;
+  color: #334155 !important;
+  box-shadow: 0 1px 2px rgba(23, 32, 51, 0.04);
+}
+
+html.light #skill-pills-container button.bg-slate-800:hover {
+  background-color: #F1F5F9 !important;
+  color: #172033 !important;
+}
+
+html.light #skill-pills-container button.bg-emerald-600 {
+  background-color: #059669 !important;
+  border-color: #047857 !important;
+  color: #FFFFFF !important;
+}
+
+html.light #skill-pills-container button.bg-emerald-600 * {
+  color: #FFFFFF !important;
+}
+
+html.light #gap-results-panel #gap-percent-badge {
+  background-color: #EEF2FF !important;
+  border-color: #C7D2FE !important;
+  color: #4338CA !important;
+  font-weight: 800;
+}
+
+html.light #gap-explanation {
+  background-color: #F8FAFC !important;
+  border-color: #DCE3EE !important;
+  color: #334155 !important;
+}
+
+/* Matched and Missing Skill Pills */
+html.light .bg-emerald-950,
+html.light .bg-emerald-950\/20,
+html.light .bg-emerald-950\/60,
+html.light .bg-emerald-950\/80,
+html.light .bg-emerald-900\/40,
+html.light .bg-emerald-900\/60 {
+  background-color: #ECFDF5 !important;
+  border-color: #A7F3D0 !important;
+  color: #065F46 !important;
+}
+
+html.light .text-emerald-400,
+html.light .text-emerald-300 {
+  color: #047857 !important;
+}
+
+html.light .bg-rose-950,
+html.light .bg-rose-950\/60,
+html.light .bg-rose-950\/80,
+html.light .bg-rose-900\/40 {
+  background-color: #FFF1F2 !important;
+  border-color: #FECDD3 !important;
+  color: #9F1239 !important;
+}
+
+html.light .text-rose-400,
+html.light .text-rose-300 {
+  color: #B91C1C !important;
+}
+
+/* 9. Learning Roadmap Section */
+html.light #roadmap-steps-container .bg-slate-900\/80 {
+  background-color: #FFFFFF !important;
+  border-color: #DCE3EE !important;
+  box-shadow: var(--card-shadow) !important;
+}
+
+html.light #roadmap-steps-container .bg-slate-900\/80:hover {
+  border-color: #CBD5E1 !important;
+}
+
+html.light #roadmap-steps-container .bg-emerald-950\/20 {
+  background-color: #F0FDF4 !important;
+  border-color: #86EFAC !important;
+}
+
+html.light #roadmap-steps-container button {
+  background-color: #FFFFFF !important;
+  border: 1px solid #DCE3EE !important;
+  color: #172033 !important;
+}
+
+html.light #roadmap-steps-container button:hover {
+  background-color: #F1F5F9 !important;
+}
+
+html.light #roadmap-steps-container button.bg-emerald-900\/40 {
+  background-color: #DCFCE7 !important;
+  border-color: #86EFAC !important;
+  color: #15803D !important;
+}
+
+html.light #roadmap-steps-container button.bg-emerald-900\/40 * {
+  color: #15803D !important;
+}
+
+/* 10. AI Mentor & Chat Section */
+html.light #view-chat .bg-slate-900\/60 {
+  background-color: #FFFFFF !important;
+  border-color: #DCE3EE !important;
+  box-shadow: var(--card-shadow) !important;
+}
+
+html.light #chat-mode-label {
+  color: #475569 !important;
+}
+
+html.light #chat-messages .bg-slate-800\/80 {
+  background-color: #F5F7FB !important;
+  border-color: #DCE3EE !important;
+  color: #172033 !important;
+}
+
+html.light #chat-messages .bg-slate-800\/80 strong {
+  color: #172033 !important;
+}
+
+html.light #chat-messages .bg-indigo-600 {
+  background-color: #5B45E8 !important;
+  color: #FFFFFF !important;
+}
+
+html.light #chat-messages .bg-indigo-600 * {
+  color: #FFFFFF !important;
+}
+
+html.light #chat-messages .bg-indigo-900 {
+  background-color: #EEF2FF !important;
+  border-color: #C7D2FE !important;
+  color: #5B45E8 !important;
+}
+
+html.light #view-chat .bg-slate-950\/60 {
+  background-color: #F8FAFC !important;
+  border-color: #DCE3EE !important;
+}
+
+/* Quick prompt pills & Bot suggestions */
+html.light #view-chat .bg-slate-950\/60 button,
+html.light #chat-messages button {
+  background-color: #FFFFFF !important;
+  border: 1px solid #DCE3EE !important;
+  box-shadow: 0 1px 2px rgba(23, 32, 51, 0.04) !important;
+  font-weight: 600 !important;
+}
+
+html.light #view-chat .bg-slate-950\/60 button:hover,
+html.light #chat-messages button:hover {
+  background-color: #EEF2FF !important;
+  border-color: #C7D2FE !important;
+  color: #4338CA !important;
+}
+
+html.light #view-chat .bg-slate-950\/60 button:nth-child(1) { color: #4338CA !important; }
+html.light #view-chat .bg-slate-950\/60 button:nth-child(2) { color: #0369A1 !important; }
+html.light #view-chat .bg-slate-950\/60 button:nth-child(3) { color: #047857 !important; }
+html.light #view-chat .bg-slate-950\/60 button:nth-child(4) { color: #B45309 !important; }
+
+html.light #chat-input {
+  background-color: #FFFFFF !important;
+  border-color: #DCE3EE !important;
+  color: #172033 !important;
+}
+
+html.light #chat-send-btn {
+  background-color: #5B45E8 !important;
+  color: #FFFFFF !important;
+}
+
+html.light #chat-send-btn:hover {
+  background-color: #4A36D4 !important;
+}
+
+/* 11. Split Auth View (Login & Registration) */
+
+/* Left Side Branding Card */
+html.light #view-auth .lg\:col-span-6:first-child {
+  background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 50%, #F0FDF4 100%) !important;
+  border-color: #C7D2FE !important;
+}
+
+html.light #view-auth .lg\:col-span-6:first-child .bg-slate-900\/60 {
+  background-color: #FFFFFF !important;
+  border-color: #DCE3EE !important;
+  box-shadow: 0 2px 8px rgba(23, 32, 51, 0.04) !important;
+}
+
+html.light #view-auth .lg\:col-span-6:first-child h4 {
+  color: #172033 !important;
+}
+
+html.light #view-auth .lg\:col-span-6:first-child p {
+  color: #475569 !important;
+}
+
+/* Right Side Form Card */
+html.light #view-auth .lg\:col-span-6:last-child {
+  background-color: #FFFFFF !important;
+  border-color: #DCE3EE !important;
+  box-shadow: 0 10px 30px -5px rgba(23, 32, 51, 0.08) !important;
+}
+
+/* Segmented switcher container */
+html.light #view-auth .bg-slate-950\/80 {
+  background-color: #F5F7FB !important;
+  border-color: #DCE3EE !important;
+}
+
+/* Inactive segmented tab */
+html.light #auth-tab-btn-login.text-slate-400,
+html.light #auth-tab-btn-register.text-slate-400 {
+  color: #475569 !important;
+  background-color: transparent !important;
+}
+
+html.light #auth-tab-btn-login.text-slate-400:hover,
+html.light #auth-tab-btn-register.text-slate-400:hover {
+  color: #172033 !important;
+  background-color: #E2E8F0 !important;
+}
+
+/* Active segmented tab */
+html.light #auth-tab-btn-login.bg-indigo-600 {
+  background-color: #5B45E8 !important;
+  color: #FFFFFF !important;
+}
+
+html.light #auth-tab-btn-register.bg-gradient-to-r {
+  background-image: linear-gradient(135deg, #059669 0%, #0D9488 100%) !important;
+  color: #FFFFFF !important;
+}
+
+html.light #auth-tab-btn-login.bg-indigo-600 *,
+html.light #auth-tab-btn-register.bg-gradient-to-r * {
+  color: #FFFFFF !important;
+}
+
+/* Auth alert feedback banner */
+html.light #auth-alert.bg-emerald-950\/80 {
+  background-color: #ECFDF5 !important;
+  border-color: #A7F3D0 !important;
+  color: #065F46 !important;
+}
+
+html.light #auth-alert.bg-rose-950\/80 {
+  background-color: #FFF1F2 !important;
+  border-color: #FECDD3 !important;
+  color: #9F1239 !important;
+}
+
+/* Auth switch prompt */
+html.light #auth-switch-prompt-text {
+  color: #475569 !important;
+}
+
+html.light #auth-switch-prompt-btn {
+  color: #5B45E8 !important;
+  font-weight: 700 !important;
+}
+
+html.light #auth-switch-prompt-btn:hover {
+  color: #4A36D4 !important;
+}
+
+html.light #form-forgot input {
+  background-color: #F8FAFC !important;
+  border-color: #DCE3EE !important;
+  color: #172033 !important;
+}
+
+/* Reset Password Page Card */
+html.light main .max-w-md {
+  background-color: #FFFFFF !important;
+  border-color: #DCE3EE !important;
+  box-shadow: 0 10px 30px -5px rgba(23, 32, 51, 0.08) !important;
+}
+
+html.light main .max-w-md h2 {
+  color: #172033 !important;
+}
+
+html.light main .max-w-md input {
+  background-color: #F8FAFC !important;
+  border-color: #DCE3EE !important;
+  color: #172033 !important;
+}
+
+/* 12. Modals, Toasts, Footers & Theme Toggles */
+
+/* Profile Modal */
+html.light #profile-modal .bg-slate-900 {
+  background-color: #FFFFFF !important;
+  border-color: #DCE3EE !important;
+  box-shadow: 0 25px 50px -12px rgba(23, 32, 51, 0.25) !important;
+}
+
+html.light #profile-modal label {
+  color: #172033 !important;
+}
+
+html.light #profile-modal code {
+  background-color: #EEF2FF !important;
+  color: #4338CA !important;
+  border: 1px solid #DCE3EE !important;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Toast */
+html.light #toast {
+  background-color: #FFFFFF !important;
+  border-color: #DCE3EE !important;
+  color: #172033 !important;
+  box-shadow: 0 10px 25px -5px rgba(23, 32, 51, 0.12) !important;
+}
+
+html.light #toast-icon {
+  color: #5B45E8 !important;
+}
+
+/* Theme Toggle Button Styling */
+#theme-toggle-btn {
+  cursor: pointer;
+}
+
+html.light #theme-toggle-btn {
+  background-color: #FFFFFF !important;
+  border-color: #DCE3EE !important;
+  color: #5B45E8 !important;
+  box-shadow: 0 1px 3px rgba(23, 32, 51, 0.06) !important;
+}
+
+html.light #theme-toggle-btn:hover {
+  background-color: #F1F5F9 !important;
+  border-color: #CBD5E1 !important;
+  color: #4A36D4 !important;
+}
+
+/* Footer */
+html.light footer {
+  background-color: #FFFFFF !important;
+  border-color: #DCE3EE !important;
+  color: #64748B !important;
+}
+
+/* Scrollbar in Light Mode */
+html.light ::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+html.light ::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+}
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* ========================================================
+   Chrome Password Manager & Native Autofill Compatibility
+   ======================================================== */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #030712 inset !important;
+  -webkit-text-fill-color: #f8fafc !important;
+  caret-color: #f8fafc !important;
+  transition: background-color 5000s ease-in-out 0s;
+  border-radius: 0.75rem !important;
+}
+
+html.light input:-webkit-autofill,
+html.light input:-webkit-autofill:hover,
+html.light input:-webkit-autofill:focus,
+html.light input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #0f172a !important;
+  caret-color: #0f172a !important;
+  transition: background-color 5000s ease-in-out 0s;
+  border-radius: 0.75rem !important;
+}
+
+/* ========================================================
+   Resume Analyzer & Intelligence Studio Styles
+   ======================================================== */
+#resume-dropzone {
+  transition: all 0.25s ease-in-out;
+}
+
+#resume-dropzone.border-indigo-500 {
+  background-color: rgba(79, 70, 229, 0.08) !important;
+  border-color: #6366f1 !important;
+  transform: scale(1.005);
+}
+
+#resume-score-circle-progress {
+  transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Light Mode Overrides for Resume Module */
+html.light #view-resume {
+  color: #1e293b;
+}
+
+html.light #view-resume .bg-slate-900,
+html.light #view-resume .bg-slate-900\/80,
+html.light #view-resume .bg-slate-900\/60 {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 4px 16px -2px rgba(23, 32, 51, 0.05);
+}
+
+html.light #view-resume .bg-slate-950,
+html.light #view-resume .bg-slate-950\/60,
+html.light #view-resume .bg-slate-950\/40 {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+html.light #view-resume .border-slate-800,
+html.light #view-resume .border-slate-800\/80,
+html.light #view-resume .border-slate-800\/60 {
+  border-color: #e2e8f0 !important;
+}
+
+html.light #view-resume .border-slate-700 {
+  border-color: #cbd5e1 !important;
+}
+
+html.light #view-resume .text-white {
+  color: #0f172a !important;
+}
+
+html.light #view-resume .text-slate-300,
+html.light #view-resume .text-slate-200 {
+  color: #334155 !important;
+}
+
+html.light #view-resume .text-slate-400 {
+  color: #64748b !important;
+}
+
+html.light #view-resume input,
+html.light #view-resume select,
+html.light #view-resume textarea {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+html.light #view-resume input::placeholder,
+html.light #view-resume textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+html.light #view-resume input:focus,
+html.light #view-resume select:focus,
+html.light #view-resume textarea:focus {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2) !important;
+}
+
+html.light #resume-dropzone {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.light #resume-dropzone:hover {
+  background-color: #f1f5f9 !important;
+  border-color: #6366f1 !important;
+}
+
+html.light #resume-history-section table thead tr {
+  border-color: #e2e8f0 !important;
+}
+
+html.light #resume-history-section table tbody tr {
+  border-color: #f1f5f9 !important;
+}
+
+html.light #resume-history-section table tbody tr:hover {
+  background-color: #f8fafc !important;
 }

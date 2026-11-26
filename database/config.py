@@ -14,9 +14,17 @@ class DatabaseSettings(BaseSettings):
     def assemble_db_connection(cls, v: str | None) -> str:
         if isinstance(v, str):
             if v.startswith("postgres://"):
-                return v.replace("postgres://", "postgresql+asyncpg://", 1)
-            if v.startswith("postgresql://") and not v.startswith("postgresql+asyncpg://"):
-                return v.replace("postgresql://", "postgresql+asyncpg://", 1)
+                v = v.replace("postgres://", "postgresql+asyncpg://", 1)
+            elif v.startswith("postgresql://") and not v.startswith("postgresql+asyncpg://"):
+                v = v.replace("postgresql://", "postgresql+asyncpg://", 1)
+
+            # asyncpg accepts ssl= instead of sslmode= in query string
+            if "sslmode=" in v:
+                v = (
+                    v.replace("sslmode=require", "ssl=require")
+                    .replace("sslmode=prefer", "ssl=prefer")
+                    .replace("sslmode=disable", "ssl=disable")
+                )
         return v
 
     model_config = SettingsConfigDict(

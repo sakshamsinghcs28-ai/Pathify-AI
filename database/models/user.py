@@ -1,6 +1,7 @@
 import uuid
+from datetime import datetime
 from typing import Optional
-from sqlalchemy import Boolean, ForeignKey, String, Text
+from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from ..base import Base, UUIDPrimaryKeyMixin, TimestampMixin
@@ -18,6 +19,8 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     assessments: Mapped[list["SkillGapAssessment"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     task_progress: Mapped[list["UserTaskProgress"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     ai_logs: Mapped[list["AIGenerationLog"]] = relationship(back_populates="user")
+    reset_tokens: Mapped[list["PasswordResetToken"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+    resumes: Mapped[list["ResumeAnalysis"]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
 class UserProfile(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "user_profiles"
@@ -29,3 +32,12 @@ class UserProfile(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     budget_notes: Mapped[Optional[str]] = mapped_column(Text)
 
     user: Mapped["User"] = relationship(back_populates="profile")
+
+class PasswordResetToken(UUIDPrimaryKeyMixin, TimestampMixin, Base):
+    __tablename__ = "password_reset_tokens"
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True, nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    used_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    user: Mapped["User"] = relationship(back_populates="reset_tokens")

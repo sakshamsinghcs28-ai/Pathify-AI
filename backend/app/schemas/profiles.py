@@ -8,10 +8,12 @@ class ProfileCreateRequest(BaseModel):
     education: Optional[str] = Field(None, description="Education background")
     skills: List[str] = Field(default_factory=list, description="List of student skills")
     targetRoleId: str = Field(..., description="Target career role identifier (e.g. role-1)")
+    profileId: Optional[str] = Field(None, description="Optional existing profile ID to update")
 
 
 class ProfileData(BaseModel):
     id: str
+    userId: Optional[str] = None
     name: str
     education: Optional[str] = None
     skills: List[str]
@@ -28,7 +30,7 @@ class ProfileCreateResponse(BaseModel):
 
 class ProfileDetailResponse(BaseModel):
     success: bool = True
-    profile: ProfileData
+    profile: Optional[ProfileData] = None
 
 
 class ProfileSkillGapResponse(BaseModel):

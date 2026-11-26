@@ -77,6 +77,7 @@ def check_models_and_relationships():
         "task_resource_mappings",
         "user_task_progress",
         "ai_generation_logs",
+        "password_reset_tokens",
     }
     actual_tables = set(Base.metadata.tables.keys())
     missing = expected_tables - actual_tables
@@ -104,7 +105,7 @@ def check_alembic_migrations():
     command.heads(alembic_cfg)
     heads_output = buf.getvalue().strip()
     print(f"  [OK] Current migration head: {heads_output}")
-    assert "001_initial_schema" in heads_output, f"Expected 001_initial_schema in heads, got: {heads_output}"
+    assert "002_password_reset_tokens" in heads_output, f"Expected 002_password_reset_tokens in heads, got: {heads_output}"
 
 
 async def check_live_connection():

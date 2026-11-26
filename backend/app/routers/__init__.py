@@ -3,6 +3,8 @@ from .roles import router as roles_router
 from .skill_gap import router as skill_gap_router
 from .profiles import router as profiles_router
 from .chat import router as chat_router
+from .auth import router as auth_router
+from .resume import router as resume_router
 
 __all__ = [
     "health_router",
@@ -10,4 +12,6 @@ __all__ = [
     "skill_gap_router",
     "profiles_router",
     "chat_router",
+    "auth_router",
+    "resume_router",
 ]

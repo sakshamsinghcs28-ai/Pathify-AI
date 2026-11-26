@@ -26,6 +26,21 @@
   </script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    // Immediate Theme Setup to prevent FOUC (Flash of Unstyled Content)
+    (function () {
+      try {
+        var theme = localStorage.getItem('pathify_theme');
+        if (theme === 'light') {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.classList.add('light');
+        } else {
+          document.documentElement.classList.add('dark');
+          document.documentElement.classList.remove('light');
+        }
+      } catch (e) {}
+    })();
+  </script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
@@ -49,41 +64,86 @@
       </div>
 
       <!-- Navigation Tabs -->
-      <nav class="hidden md:flex space-x-1 lg:space-x-2">
-        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn px-3 py-2 text-sm font-medium rounded-lg text-indigo-400 bg-slate-800/80 flex items-center gap-1.5 transition">
-          <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
-        </button>
-        <button onclick="switchTab('careers')" id="nav-careers" class="nav-btn px-3 py-2 text-sm font-medium rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 flex items-center gap-1.5 transition">
-          <i data-lucide="briefcase" class="w-4 h-4"></i> Careers
-        </button>
-        <button onclick="switchTab('skillgap')" id="nav-skillgap" class="nav-btn px-3 py-2 text-sm font-medium rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 flex items-center gap-1.5 transition">
-          <i data-lucide="git-compare" class="w-4 h-4"></i> Skill Gap
-        </button>
-        <button onclick="switchTab('roadmap')" id="nav-roadmap" class="nav-btn px-3 py-2 text-sm font-medium rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 flex items-center gap-1.5 transition">
-          <i data-lucide="map" class="w-4 h-4"></i> Roadmap
-        </button>
-        <button onclick="switchTab('chat')" id="nav-chat" class="nav-btn px-3 py-2 text-sm font-medium rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 flex items-center gap-1.5 transition">
-          <i data-lucide="bot" class="w-4 h-4 text-cyan-400"></i> AI Mentor
-        </button>
+      <nav id="desktop-nav-links" class="hidden md:flex space-x-1 lg:space-x-2">
+        <div id="protected-nav-links" class="hidden flex space-x-1 lg:space-x-2">
+          <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn px-3 py-2 text-sm font-medium rounded-lg text-indigo-400 bg-slate-800/80 flex items-center gap-1.5 transition">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+          </button>
+          <button onclick="switchTab('careers')" id="nav-careers" class="nav-btn px-3 py-2 text-sm font-medium rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 flex items-center gap-1.5 transition">
+            <i data-lucide="briefcase" class="w-4 h-4"></i> Careers
+          </button>
+          <button onclick="switchTab('skillgap')" id="nav-skillgap" class="nav-btn px-3 py-2 text-sm font-medium rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 flex items-center gap-1.5 transition">
+            <i data-lucide="git-compare" class="w-4 h-4"></i> Skill Gap
+          </button>
+          <button onclick="switchTab('resume')" id="nav-resume" class="nav-btn px-3 py-2 text-sm font-medium rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 flex items-center gap-1.5 transition">
+            <i data-lucide="file-text" class="w-4 h-4 text-emerald-400"></i> Resume
+          </button>
+          <button onclick="switchTab('roadmap')" id="nav-roadmap" class="nav-btn px-3 py-2 text-sm font-medium rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 flex items-center gap-1.5 transition">
+            <i data-lucide="map" class="w-4 h-4"></i> Roadmap
+          </button>
+          <button onclick="switchTab('chat')" id="nav-chat" class="nav-btn px-3 py-2 text-sm font-medium rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 flex items-center gap-1.5 transition">
+            <i data-lucide="bot" class="w-4 h-4 text-cyan-400"></i> AI Mentor
+          </button>
+        </div>
       </nav>
 
-      <!-- System Health Indicator -->
+      <!-- System Health & Authentication Controls -->
       <div class="flex items-center space-x-3">
-        <div id="health-badge" class="flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-950/80 border border-emerald-800/60 text-emerald-400">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span id="health-text">PostgreSQL Online</span>
+        <div id="health-badge" class="flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-800/80 border border-slate-700/60 text-slate-400">
+          <span id="health-dot" class="w-2 h-2 rounded-full bg-slate-400 animate-pulse"></span>
+          <span id="health-text">Connecting...</span>
+        </div>
+
+        <!-- Theme Toggle Button -->
+        <button id="theme-toggle-btn" onclick="toggleTheme()" type="button" aria-label="Toggle theme" title="Toggle theme (Light / Dark)" class="p-2 rounded-xl text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700 border border-slate-700 transition flex items-center justify-center">
+          <i id="theme-toggle-icon" data-lucide="sun" class="w-4 h-4 text-amber-400"></i>
+        </button>
+
+        <!-- Logged Out State: Sign In / Register Buttons -->
+        <div id="auth-nav-logged-out" class="flex items-center space-x-2">
+          <button onclick="openAuthView('login')" class="px-3 py-1.5 text-xs font-semibold rounded-xl text-slate-200 hover:text-white bg-slate-800/80 hover:bg-slate-700 border border-slate-700 transition flex items-center gap-1.5">
+            <i data-lucide="log-in" class="w-3.5 h-3.5 text-indigo-400"></i>
+            <span>Sign In</span>
+          </button>
+          <button onclick="openAuthView('register')" class="hidden sm:inline-flex px-3.5 py-1.5 text-xs font-bold rounded-xl text-white bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 shadow-md shadow-indigo-600/30 transition items-center gap-1.5">
+            <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+            <span>Register</span>
+          </button>
+        </div>
+
+        <!-- Logged In State: User Chip and Sign Out -->
+        <div id="auth-nav-logged-in" class="hidden flex items-center space-x-2">
+          <div class="flex items-center gap-2 px-2.5 py-1 rounded-xl bg-slate-800/80 border border-indigo-900/60">
+            <div id="auth-user-avatar" class="w-6 h-6 rounded-lg bg-gradient-to-tr from-indigo-600 to-cyan-500 flex items-center justify-center text-white text-[11px] font-bold">
+              U
+            </div>
+            <div class="flex flex-col text-left">
+              <span id="auth-user-name" class="text-xs font-bold text-slate-100 max-w-[110px] truncate">User</span>
+              <span id="auth-user-role" class="text-[10px] text-indigo-300 font-medium">Student</span>
+            </div>
+          </div>
+          <button onclick="logoutUser()" title="Sign Out" class="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-800/80 transition">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+          </button>
         </div>
       </div>
     </div>
   </header>
 
   <!-- Mobile Navigation Bar -->
-  <div class="md:hidden flex justify-around bg-slate-900 border-b border-slate-800 py-2 px-2">
-    <button onclick="switchTab('dashboard')" class="text-xs px-2 py-1 rounded flex flex-col items-center text-indigo-400"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>Dash</button>
-    <button onclick="switchTab('careers')" class="text-xs px-2 py-1 rounded flex flex-col items-center text-slate-400"><i data-lucide="briefcase" class="w-4 h-4"></i>Roles</button>
-    <button onclick="switchTab('skillgap')" class="text-xs px-2 py-1 rounded flex flex-col items-center text-slate-400"><i data-lucide="git-compare" class="w-4 h-4"></i>Gap</button>
-    <button onclick="switchTab('roadmap')" class="text-xs px-2 py-1 rounded flex flex-col items-center text-slate-400"><i data-lucide="map" class="w-4 h-4"></i>Roadmap</button>
-    <button onclick="switchTab('chat')" class="text-xs px-2 py-1 rounded flex flex-col items-center text-slate-400"><i data-lucide="bot" class="w-4 h-4"></i>AI Chat</button>
+  <div id="mobile-nav-bar" class="md:hidden flex justify-around bg-slate-900 border-b border-slate-800 py-2 px-2">
+    <div id="mobile-protected-links" class="hidden flex justify-around flex-1">
+      <button onclick="switchTab('dashboard')" class="text-xs px-2 py-1 rounded flex flex-col items-center text-indigo-400"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>Dash</button>
+      <button onclick="switchTab('careers')" class="text-xs px-2 py-1 rounded flex flex-col items-center text-slate-400"><i data-lucide="briefcase" class="w-4 h-4"></i>Roles</button>
+      <button onclick="switchTab('skillgap')" class="text-xs px-2 py-1 rounded flex flex-col items-center text-slate-400"><i data-lucide="git-compare" class="w-4 h-4"></i>Gap</button>
+      <button onclick="switchTab('resume')" class="text-xs px-2 py-1 rounded flex flex-col items-center text-slate-400"><i data-lucide="file-text" class="w-4 h-4 text-emerald-400"></i>Resume</button>
+      <button onclick="switchTab('roadmap')" class="text-xs px-2 py-1 rounded flex flex-col items-center text-slate-400"><i data-lucide="map" class="w-4 h-4"></i>Roadmap</button>
+      <button onclick="switchTab('chat')" class="text-xs px-2 py-1 rounded flex flex-col items-center text-slate-400"><i data-lucide="bot" class="w-4 h-4"></i>AI Chat</button>
+    </div>
+    <div class="flex justify-around items-center space-x-2">
+      <button id="mobile-theme-btn" onclick="toggleTheme()" type="button" class="text-xs px-2 py-1 rounded flex flex-col items-center text-slate-400"><i id="mobile-theme-icon" data-lucide="sun" class="w-4 h-4 text-amber-400"></i><span id="mobile-theme-text" class="text-[10px]">Theme</span></button>
+      <button id="mobile-auth-btn" onclick="openAuthView('login')" class="text-xs px-2 py-1 rounded flex flex-col items-center text-slate-400"><i data-lucide="user" class="w-4 h-4"></i><span id="mobile-auth-text">Sign In</span></button>
+    </div>
   </div>
 
   <!-- Main Content Area -->
@@ -92,7 +152,7 @@
     <!-- ========================================== -->
     <!-- 1. DASHBOARD VIEW -->
     <!-- ========================================== -->
-    <section id="view-dashboard" class="space-y-10 animate-fade-in">
+    <section id="view-dashboard" class="space-y-10 animate-fade-in hidden">
       <!-- Hero Banner -->
       <div class="relative overflow-hidden rounded-3xl bg-gradient-to-b from-indigo-950/60 via-slate-900 to-slate-900/80 border border-indigo-900/40 p-8 sm:p-12">
         <div class="relative z-10 max-w-3xl space-y-4">
@@ -108,13 +168,16 @@
           </p>
           <div class="pt-4 flex flex-wrap gap-3">
             <button onclick="switchTab('careers')" class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold flex items-center gap-2 shadow-lg shadow-indigo-600/30 transition">
-              <i data-lucide="compass" class="w-4 h-4"></i> Explore 3 Career Paths
+              <i data-lucide="compass" class="w-4 h-4"></i> Explore Careers
+            </button>
+            <button onclick="switchTab('resume')" class="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold flex items-center gap-2 shadow-lg shadow-emerald-600/30 transition">
+              <i data-lucide="file-check" class="w-4 h-4"></i> Scan Resume ATS
             </button>
             <button onclick="switchTab('skillgap')" class="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold flex items-center gap-2 transition">
-              <i data-lucide="git-compare" class="w-4 h-4 text-cyan-400"></i> Test My Skill Gap
+              <i data-lucide="git-compare" class="w-4 h-4 text-cyan-400"></i> Skill Gap
             </button>
             <button onclick="switchTab('chat')" class="px-6 py-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-cyan-800/40 font-semibold flex items-center gap-2 transition">
-              <i data-lucide="bot" class="w-4 h-4 text-emerald-400"></i> Ask AI Mentor
+              <i data-lucide="bot" class="w-4 h-4 text-emerald-400"></i> AI Mentor
             </button>
           </div>
         </div>
@@ -183,9 +246,16 @@
     <!-- 3. SKILL GAP ANALYZER VIEW -->
     <!-- ========================================== -->
     <section id="view-skillgap" class="space-y-8 hidden animate-fade-in">
-      <div class="border-b border-slate-800 pb-5">
-        <h2 class="text-2xl font-bold text-white">Skill-Gap Analyzer</h2>
-        <p class="text-slate-400 text-sm mt-1">Select your target career, check off the skills you already possess, and immediately uncover your missing skills.</p>
+      <div class="border-b border-slate-800 pb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-bold text-white">Career Skill Assessment Engine</h2>
+          <p class="text-slate-400 text-sm mt-1">Assess your proficiency levels, compute weighted industry readiness, and discover personalized learning milestones.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btn-assessment-history" onclick="toggleAssessmentHistoryModal()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+            <i data-lucide="history" class="w-4 h-4 text-indigo-400"></i> Past Assessments
+          </button>
+        </div>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -201,12 +271,15 @@
             </select>
           </div>
 
-          <!-- Existing Skills Checklist -->
+          <!-- Existing Skills Checklist with Proficiency Levels -->
           <div>
-            <label class="block text-sm font-semibold text-slate-200 mb-2">2. Check Off Skills You Already Know</label>
-            <p class="text-xs text-slate-400 mb-3">Click on any skill pill to toggle your proficiency:</p>
-            <div id="skill-pills-container" class="flex flex-wrap gap-2 max-h-48 overflow-y-auto p-1 border border-slate-800/80 rounded-xl bg-slate-950/40">
-              <!-- Dynamically populated skill toggles -->
+            <div class="flex items-center justify-between mb-2">
+              <label class="block text-sm font-semibold text-slate-200">2. Skills &amp; Proficiency Levels</label>
+              <span class="text-[11px] text-slate-400">Beginner • Intermediate • Advanced • Expert</span>
+            </div>
+            <p class="text-xs text-slate-400 mb-3">Click any skill to select it and choose your proficiency:</p>
+            <div id="skill-pills-container" class="flex flex-wrap gap-2 max-h-56 overflow-y-auto p-2 border border-slate-800/80 rounded-xl bg-slate-950/40">
+              <!-- Dynamically populated skill toggles with proficiency -->
             </div>
           </div>
 
@@ -219,18 +292,53 @@
             </div>
           </div>
 
-          <button onclick="runSkillGapAnalysis()" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 transition">
-            <i data-lucide="sparkles" class="w-4 h-4"></i> Run Skill-Gap Analysis
+          <!-- Optional Applied Project & Internship Experience -->
+          <div class="p-4 rounded-xl bg-slate-950/40 border border-slate-800/80 space-y-3">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                <i data-lucide="briefcase" class="w-3.5 h-3.5 text-cyan-400"></i> Applied Experience (Optional)
+              </label>
+              <span class="text-[10px] text-cyan-400 font-medium">Weighted Readiness Boost</span>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] text-slate-400 mb-1">Projects Completed</label>
+                <input type="number" id="exp-projects-count" min="0" max="20" value="0" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-indigo-500">
+              </div>
+              <div>
+                <label class="block text-[11px] text-slate-400 mb-1">Internship (Months)</label>
+                <input type="number" id="exp-internship-months" min="0" max="60" value="0" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-indigo-500">
+              </div>
+            </div>
+          </div>
+
+          <button id="run-skillgap-btn" onclick="runSkillGapAnalysis(true)" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 transition disabled:opacity-75 disabled:cursor-wait">
+            <span id="skillgap-btn-spinner" class="hidden">
+              <svg class="animate-spin w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+              </svg>
+            </span>
+            <span id="skillgap-btn-icon" class="flex items-center gap-2">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+            </span>
+            <span id="skillgap-btn-text">Run Skill-Gap Analysis</span>
           </button>
         </div>
 
         <!-- Right Column: Analysis Results -->
         <div class="lg:col-span-6 bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between" id="gap-results-panel">
-          <div class="space-y-6">
+          <div class="space-y-5">
+            <!-- Error Alert Callout -->
+            <div id="gap-error-alert" class="hidden p-4 rounded-xl bg-rose-950/70 border border-rose-800 text-sm text-rose-300 flex items-start gap-2.5">
+              <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-400 mt-0.5 shrink-0"></i>
+              <span id="gap-error-text">An error occurred during skill-gap analysis.</span>
+            </div>
+
             <div class="flex items-center justify-between border-b border-slate-800 pb-4">
               <div>
                 <h3 class="font-bold text-lg text-white" id="gap-result-title">Full-Stack Developer Readiness</h3>
-                <span class="text-xs text-slate-400">PostgreSQL Verified Comparison</span>
+                <span id="gap-score-breakdown" class="text-xs text-slate-400 block mt-0.5">Weighted PostgreSQL Industry Analysis</span>
               </div>
               <div id="gap-percent-badge" class="px-3.5 py-1.5 rounded-full text-base font-extrabold bg-indigo-950 border border-indigo-700 text-indigo-300">
                 0% Match
@@ -239,7 +347,7 @@
 
             <!-- Explanation Callout -->
             <div id="gap-explanation" class="p-4 rounded-xl bg-slate-800/70 border border-slate-700 text-sm text-slate-300">
-              Select your known skills on the left to compute your match percentage and discover your curriculum gaps.
+              Select your known skills on the left to compute your weighted match percentage and discover your curriculum gaps.
             </div>
 
             <!-- Matched Skills -->
@@ -252,19 +360,39 @@
               </div>
             </div>
 
-            <!-- Missing Skills -->
+            <!-- Skills Needing Improvement -->
+            <div class="space-y-2">
+              <div class="text-xs font-semibold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                <i data-lucide="trending-up" class="w-4 h-4"></i> Skills Needing Level-Up (<span id="improving-count">0</span>)
+              </div>
+              <div id="improving-skills-list" class="flex flex-wrap gap-2 text-sm text-slate-400 italic">
+                None.
+              </div>
+            </div>
+
+            <!-- Missing Skills (Categorized by Priority) -->
             <div class="space-y-2">
               <div class="text-xs font-semibold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
-                <i data-lucide="alert-circle" class="w-4 h-4"></i> Skills to Learn (<span id="missing-count">0</span>)
+                <i data-lucide="alert-circle" class="w-4 h-4"></i> Missing Skills by Priority (<span id="missing-count">0</span>)
               </div>
               <div id="missing-skills-list" class="flex flex-wrap gap-2 text-sm text-slate-400 italic">
                 All skills required.
               </div>
             </div>
+
+            <!-- Personalized Learning Recommendations -->
+            <div class="space-y-2 pt-2 border-t border-slate-800/80">
+              <div class="text-xs font-semibold text-indigo-400 uppercase tracking-wider flex items-center gap-1.5">
+                <i data-lucide="lightbulb" class="w-4 h-4"></i> Personalized Recommendations
+              </div>
+              <div id="recommendations-list" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                <span class="text-xs text-slate-500 italic">Run assessment to view tailored recommendations.</span>
+              </div>
+            </div>
           </div>
 
           <!-- Action to Roadmap -->
-          <div class="pt-6 border-t border-slate-800 mt-6">
+          <div class="pt-5 border-t border-slate-800 mt-5">
             <button onclick="generateRoadmapFromGap()" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 transition">
               <i data-lucide="map-pin" class="w-4 h-4"></i> View Custom Learning Roadmap &rarr;
             </button>
@@ -286,6 +414,26 @@
           <button onclick="openSaveProfileModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition">
             <i data-lucide="save" class="w-4 h-4"></i> Save Student Profile
           </button>
+        </div>
+      </div>
+
+      <!-- Roadmap Target Career Selector Dropdown -->
+      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shrink-0">
+            <i data-lucide="compass" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <label for="roadmap-role-select" class="block text-sm font-bold text-white">Choose Target Career</label>
+            <p class="text-xs text-slate-400">Select a career pathway to view its tailored step-by-step learning milestones.</p>
+          </div>
+        </div>
+        <div class="w-full sm:w-72">
+          <select id="roadmap-role-select" onchange="onRoadmapRoleSelectionChanged()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+            <option value="role-1">Full-Stack Developer</option>
+            <option value="role-2">Data Analyst</option>
+            <option value="role-3">AI Engineer</option>
+          </select>
         </div>
       </div>
 
@@ -376,6 +524,853 @@
       </div>
     </section>
 
+    <!-- ========================================== -->
+    <!-- RESUME ANALYZER & INTELLIGENCE STUDIO -->
+    <!-- ========================================== -->
+    <section id="view-resume" class="space-y-8 hidden animate-fade-in">
+      <!-- Hero Header -->
+      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-b from-emerald-950/40 via-slate-900 to-slate-900/80 border border-emerald-900/40 p-6 sm:p-10">
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div class="space-y-3 max-w-2xl">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-semibold">
+              <i data-lucide="file-check" class="w-3.5 h-3.5 text-emerald-400"></i> Next-Gen Resume ATS Scanner &amp; AI Studio
+            </div>
+            <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-white leading-tight">
+              Resume Intelligence &amp; <br>
+              <span class="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">Four-Pillar ATS Diagnostics</span>
+            </h1>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              Upload your resume (PDF, Word, or Text) to evaluate ATS compliance across 4 pillars, detect missing technical keywords, match job descriptions, and generate Google XYZ formula rewrites.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap md:flex-col gap-2.5 shrink-0">
+            <button onclick="document.getElementById('resume-history-section').scrollIntoView({ behavior: 'smooth' })" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 transition flex items-center justify-center gap-2">
+              <i data-lucide="history" class="w-4 h-4 text-indigo-400"></i> Scan History
+            </button>
+            <button onclick="document.getElementById('ai-improvement-studio').scrollIntoView({ behavior: 'smooth' })" class="px-4 py-2.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 text-xs font-bold border border-indigo-700/50 transition flex items-center justify-center gap-2">
+              <i data-lucide="sparkles" class="w-4 h-4 text-indigo-400"></i> AI Bullet Studio
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upload & Analysis Setup Card -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Left 7 cols: Drag-and-Drop Zone -->
+        <div class="lg:col-span-7 bg-slate-900/80 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-4 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <i data-lucide="upload-cloud" class="w-5 h-5 text-indigo-400"></i> 1. Select Resume Document
+              </h3>
+              <span class="text-xs text-slate-400">PDF, DOCX, TXT (Max 5MB)</span>
+            </div>
+
+            <!-- Dropzone Box -->
+            <div id="resume-dropzone" onclick="document.getElementById('resume-file-input').click()" class="relative border-2 border-dashed border-slate-700 hover:border-indigo-500 rounded-2xl p-8 sm:p-12 text-center cursor-pointer transition bg-slate-950/40 hover:bg-slate-950/70 group">
+              <input type="file" id="resume-file-input" accept=".pdf,.docx,.doc,.txt" class="hidden">
+
+              <!-- Prompt State -->
+              <div id="resume-dropzone-prompt" class="space-y-3">
+                <div class="w-14 h-14 mx-auto rounded-2xl bg-indigo-600/10 group-hover:bg-indigo-600/20 border border-indigo-500/20 group-hover:border-indigo-500/40 flex items-center justify-center text-indigo-400 transition transform group-hover:scale-105">
+                  <i data-lucide="file-up" class="w-7 h-7"></i>
+                </div>
+                <div class="space-y-1">
+                  <p class="text-sm font-bold text-slate-200">
+                    <span class="text-indigo-400 underline underline-offset-2">Click to browse</span> or drag and drop your file here
+                  </p>
+                  <p class="text-xs text-slate-400">
+                    Supports high-accuracy native PDF text extraction, tables, and lists
+                  </p>
+                </div>
+              </div>
+
+              <!-- Selected File Details Chip -->
+              <div id="resume-file-details" class="hidden flex items-center justify-between p-4 rounded-xl bg-slate-900 border border-indigo-500/40 text-left">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                    <i data-lucide="file-check" class="w-5 h-5"></i>
+                  </div>
+                  <div>
+                    <p id="resume-file-name" class="text-xs font-bold text-white max-w-[220px] sm:max-w-xs truncate">resume.pdf</p>
+                    <p id="resume-file-size" class="text-[11px] text-slate-400">120 KB</p>
+                  </div>
+                </div>
+                <button type="button" onclick="removeSelectedResumeFile(event)" class="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-800 transition" title="Remove file">
+                  <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stepper progress bar -->
+          <div id="resume-processing-stepper" class="hidden pt-2 border-t border-slate-800/80 space-y-2">
+            <div class="flex items-center justify-between text-xs text-slate-300">
+              <span id="resume-stepper-status" class="font-medium animate-pulse">Processing document...</span>
+              <div class="flex items-center gap-1.5">
+                <span id="resume-step-dot-1" class="w-2.5 h-2.5 rounded-full bg-slate-700"></span>
+                <span id="resume-step-dot-2" class="w-2.5 h-2.5 rounded-full bg-slate-700"></span>
+                <span id="resume-step-dot-3" class="w-2.5 h-2.5 rounded-full bg-slate-700"></span>
+                <span id="resume-step-dot-4" class="w-2.5 h-2.5 rounded-full bg-slate-700"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right 5 cols: Target Role & JD Configuration -->
+        <div class="lg:col-span-5 bg-slate-900/80 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-4 flex flex-col justify-between">
+          <div class="space-y-4">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="crosshair" class="w-5 h-5 text-indigo-400"></i> 2. Target Role &amp; JD Match
+            </h3>
+
+            <div>
+              <label for="resume-target-role" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                Target Career Benchmark
+              </label>
+              <select id="resume-target-role" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <!-- Populated dynamically via initResumeView -->
+                <option value="role-1">Full-Stack Developer</option>
+                <option value="role-2">Data Analyst</option>
+                <option value="role-3">AI Engineer</option>
+              </select>
+              <p class="text-[11px] text-slate-400 mt-1">Benchmarks against curated industry skill competencies.</p>
+            </div>
+
+            <div>
+              <label for="resume-target-jd" class="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
+                <span>Job Description (Optional)</span>
+                <span class="text-[10px] text-indigo-400">Keyword Overlap</span>
+              </label>
+              <textarea id="resume-target-jd" rows="4" placeholder="Paste target job description to analyze specific keyword match and missing technical requirements..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"></textarea>
+            </div>
+          </div>
+
+          <button id="btn-analyze-resume" onclick="startResumeAnalysis()" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white rounded-xl text-sm font-bold shadow-lg shadow-emerald-900/20 transition flex items-center justify-center gap-2">
+            <i id="resume-analyze-spinner" data-lucide="loader-2" class="w-4 h-4 animate-spin hidden"></i>
+            <span id="resume-analyze-btn-text">Analyze Resume</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- ============================================================== -->
+      <!-- RESULTS CONTAINER (Unhidden after successful analysis) -->
+      <!-- ============================================================== -->
+      <div id="resume-results-container" class="space-y-8 hidden">
+        <!-- Dashboard Top Banner: Overall Score & Quick Actions -->
+        <div class="bg-gradient-to-br from-slate-900 via-slate-900/90 to-indigo-950/40 border border-indigo-900/40 rounded-3xl p-6 sm:p-8 space-y-6">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-slate-800">
+            <div class="flex items-center gap-5">
+              <!-- Circular Progress Gauge -->
+              <div class="relative w-24 h-24 shrink-0 flex items-center justify-center">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="40" stroke="currentColor" stroke-width="8" class="text-slate-800" fill="transparent" />
+                  <circle id="resume-score-circle-progress" cx="50" cy="50" r="40" stroke="#10b981" stroke-width="8" stroke-linecap="round" fill="transparent" stroke-dasharray="251.3" stroke-dashoffset="50" class="transition-all duration-1000 ease-out" />
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                  <span id="resume-overall-score" class="text-2xl font-black text-white">0</span>
+                  <span class="text-[9px] uppercase tracking-wider text-slate-400 font-bold">ATS Score</span>
+                </div>
+              </div>
+
+              <div class="space-y-1.5">
+                <div class="flex items-center gap-2">
+                  <span id="resume-score-tier" class="px-3 py-0.5 rounded-full text-xs font-bold border bg-emerald-500/10 text-emerald-400 border-emerald-500/30">
+                    ATS Ready
+                  </span>
+                </div>
+                <h2 class="text-xl font-bold text-white">Resume Intelligence Summary</h2>
+                <p id="resume-score-description" class="text-xs text-slate-300 max-w-xl leading-relaxed">
+                  Calculated using deep structural parsing and multi-pillar industry ATS algorithms.
+                </p>
+              </div>
+            </div>
+
+            <!-- Action CTAs -->
+            <div class="flex flex-wrap items-center gap-3">
+              <button id="btn-download-pdf" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white text-xs font-bold shadow-md shadow-indigo-600/30 transition flex items-center gap-2">
+                <i data-lucide="download" class="w-4 h-4"></i> Download PDF Report
+              </button>
+              <button onclick="document.getElementById('resume-extraction-studio').scrollIntoView({ behavior: 'smooth' })" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition flex items-center gap-2">
+                <i data-lucide="edit-3" class="w-4 h-4 text-cyan-400"></i> Correct Data
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Stats Bar -->
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
+            <div class="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800 space-y-1">
+              <span class="text-[11px] text-slate-400">Document File</span>
+              <p id="resume-stat-filename" class="text-xs font-bold text-white truncate">-</p>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800 space-y-1">
+              <span class="text-[11px] text-slate-400">Target Role</span>
+              <p id="resume-stat-role" class="text-xs font-bold text-indigo-400 truncate">-</p>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800 space-y-1">
+              <span class="text-[11px] text-slate-400">Word Count</span>
+              <p id="resume-stat-words" class="text-xs font-bold text-white">-</p>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800 space-y-1">
+              <span class="text-[11px] text-slate-400">Matched Skills</span>
+              <p id="resume-stat-matched-skills" class="text-xs font-bold text-emerald-400">0</p>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800 space-y-1 col-span-2 sm:col-span-1">
+              <span class="text-[11px] text-slate-400">Missing Gaps</span>
+              <p id="resume-stat-missing-skills" class="text-xs font-bold text-rose-400">0</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Four Pillars Grid -->
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                <i data-lucide="layers" class="w-5 h-5 text-indigo-400"></i> Four-Pillar ATS Diagnostics
+              </h3>
+              <p class="text-xs text-slate-400">Each pillar represents 25% of your final ATS intelligence rating.</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Pillar 1: Formatting -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 space-y-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                    <i data-lucide="layout" class="w-4 h-4"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-bold text-white">Formatting &amp; ATS Architecture</h4>
+                    <span class="text-[11px] text-slate-400">Layout, standard headers, parsability</span>
+                  </div>
+                </div>
+                <span id="pillar-score-formatting" class="text-sm font-black text-indigo-400">0/100</span>
+              </div>
+              <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                <div id="pillar-bar-formatting" class="h-2 rounded-full bg-indigo-500" style="width: 0%"></div>
+              </div>
+              <ul id="pillar-findings-formatting" class="space-y-2 pt-2 border-t border-slate-800/80">
+                <!-- Dynamically populated -->
+              </ul>
+            </div>
+
+            <!-- Pillar 2: Content Quality -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 space-y-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                    <i data-lucide="check-square" class="w-4 h-4"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-bold text-white">Content Quality &amp; Impact</h4>
+                    <span class="text-[11px] text-slate-400">Action verbs, metrics, buzzwords</span>
+                  </div>
+                </div>
+                <span id="pillar-score-content" class="text-sm font-black text-emerald-400">0/100</span>
+              </div>
+              <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                <div id="pillar-bar-content" class="h-2 rounded-full bg-emerald-500" style="width: 0%"></div>
+              </div>
+              <ul id="pillar-findings-content" class="space-y-2 pt-2 border-t border-slate-800/80">
+                <!-- Dynamically populated -->
+              </ul>
+            </div>
+
+            <!-- Pillar 3: Skills -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 space-y-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                    <i data-lucide="cpu" class="w-4 h-4"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-bold text-white">Skills &amp; Technical Coverage</h4>
+                    <span class="text-[11px] text-slate-400">Alignment with target role competencies</span>
+                  </div>
+                </div>
+                <span id="pillar-score-skills" class="text-sm font-black text-cyan-400">0/100</span>
+              </div>
+              <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                <div id="pillar-bar-skills" class="h-2 rounded-full bg-cyan-500" style="width: 0%"></div>
+              </div>
+              <ul id="pillar-findings-skills" class="space-y-2 pt-2 border-t border-slate-800/80">
+                <!-- Dynamically populated -->
+              </ul>
+            </div>
+
+            <!-- Pillar 4: Experience Alignment -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 space-y-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                    <i data-lucide="briefcase" class="w-4 h-4"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-bold text-white">Relevance &amp; Experience Alignment</h4>
+                    <span class="text-[11px] text-slate-400">Career trajectory, dates, project depth</span>
+                  </div>
+                </div>
+                <span id="pillar-score-experience" class="text-sm font-black text-amber-400">0/100</span>
+              </div>
+              <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                <div id="pillar-bar-experience" class="h-2 rounded-full bg-amber-500" style="width: 0%"></div>
+              </div>
+              <ul id="pillar-findings-experience" class="space-y-2 pt-2 border-t border-slate-800/80">
+                <!-- Dynamically populated -->
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Missing Skills & Career Roadmap Sync -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2.5">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                  <i data-lucide="alert-circle" class="w-5 h-5 text-rose-400"></i> Missing Skills &amp; Growth Priorities
+                </h3>
+                <span id="resume-missing-skills-count" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-500/10 text-rose-300 border border-rose-500/30">
+                  0 Identified
+                </span>
+              </div>
+              <p class="text-xs text-slate-400 mt-1">High-impact competencies present in target benchmarks that are missing from your resume.</p>
+            </div>
+
+            <button id="btn-sync-to-roadmap" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold shadow-md shadow-emerald-700/30 transition flex items-center gap-2 shrink-0">
+              <i data-lucide="map-pin" class="w-4 h-4"></i> Sync Missing Skills to Roadmap
+            </button>
+          </div>
+
+          <div id="resume-missing-skills-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Job Description Keyword Alignment (Conditional/Interactive) -->
+        <div id="resume-jd-match-panel" class="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                <i data-lucide="file-search" class="w-5 h-5 text-indigo-400"></i> Job Description Keyword Alignment
+              </h3>
+              <p class="text-xs text-slate-400 mt-1">Direct token overlap between your resume text and target requirements.</p>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <span class="text-xs text-slate-400">Match Percentage:</span>
+              <span id="resume-jd-match-percent" class="text-base font-black text-emerald-400">-</span>
+            </div>
+          </div>
+
+          <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+            <div id="resume-jd-match-gauge" class="h-2.5 rounded-full bg-emerald-500 transition-all duration-500" style="width: 0%"></div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+            <!-- Matched Tags -->
+            <div class="space-y-2.5">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Matched Keywords in Resume
+              </h4>
+              <div id="resume-jd-matched-tags" class="flex flex-wrap gap-1.5 min-h-[48px] p-3 rounded-2xl bg-slate-950/60 border border-slate-800">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <!-- Missing Tags -->
+            <div class="space-y-2.5">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
+                <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Missing Job Keywords to Add
+              </h4>
+              <div id="resume-jd-missing-tags" class="flex flex-wrap gap-1.5 min-h-[48px] p-3 rounded-2xl bg-slate-950/60 border border-slate-800">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Parsed Resume Extraction & Correction Studio -->
+        <div id="resume-extraction-studio" class="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                <i data-lucide="edit-3" class="w-5 h-5 text-indigo-400"></i> Parsed Resume Extraction &amp; Real-Time Correction
+              </h3>
+              <p class="text-xs text-slate-400 mt-1">Review extracted entities. Correct any misidentified contacts or skills to dynamically update your ATS score.</p>
+            </div>
+
+            <button id="btn-save-resume-corrections" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-md shadow-indigo-600/30 transition flex items-center gap-2 shrink-0">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i> Recalculate Scores with Corrections
+            </button>
+          </div>
+
+          <!-- Contact Info Fields -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Candidate Name</label>
+              <input type="text" id="resume-edit-name" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Email Address</label>
+              <input type="email" id="resume-edit-email" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Phone Number</label>
+              <input type="text" id="resume-edit-phone" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">LinkedIn Profile</label>
+              <input type="text" id="resume-edit-linkedin" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">
+            </div>
+            <div class="sm:col-span-2 lg:col-span-2">
+              <label class="block text-xs font-semibold text-slate-300 mb-1">GitHub / Portfolio URL</label>
+              <input type="text" id="resume-edit-github" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">
+            </div>
+          </div>
+
+          <!-- Skills Tag Cloud & Add Skill -->
+          <div class="space-y-3 pt-3 border-t border-slate-800">
+            <label class="block text-xs font-semibold text-slate-300">
+              Identified Skills (Click &times; to remove, or add new skills below)
+            </label>
+            <div id="resume-extracted-skills-cloud" class="flex flex-wrap gap-2 min-h-[50px] p-3 rounded-2xl bg-slate-950/60 border border-slate-800">
+              <!-- Dynamically populated -->
+            </div>
+
+            <div class="flex items-center gap-2 max-w-md">
+              <input type="text" id="resume-add-skill-input" placeholder="e.g. Docker, GraphQL, Kubernetes..." class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500">
+              <button type="button" onclick="addCustomSkillToResume()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Skill
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Improvement Studio (Google XYZ Formula) -->
+        <div id="ai-improvement-studio" class="bg-gradient-to-br from-slate-900 via-indigo-950/30 to-slate-900 border border-indigo-900/40 rounded-3xl p-6 sm:p-8 space-y-6">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-semibold mb-2">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-indigo-400"></i> AI Bullet Point Improvement Studio
+            </div>
+            <h3 class="text-xl font-bold text-white">Google XYZ Formula Experience Rewriter</h3>
+            <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+              Transform passive, responsibility-focused bullets into high-impact accomplishment statements:
+              <span class="text-indigo-300 font-semibold">&ldquo;Accomplished [X], as measured by [Y], by doing [Z]&rdquo;</span>.
+            </p>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <label for="ai-bullet-input" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                Experience Bullet Point to Optimize
+              </label>
+              <textarea id="ai-bullet-input" rows="3" placeholder="Paste an experience bullet point (e.g. 'Responsible for building React features and fixing database performance')..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none font-mono"></textarea>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+              <div class="flex items-center gap-2 flex-1 max-w-xs">
+                <label for="ai-bullet-role" class="text-xs font-semibold text-slate-400 shrink-0">Target Role:</label>
+                <input type="text" id="ai-bullet-role" value="Full-Stack Developer" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white">
+              </div>
+
+              <button id="btn-ai-rewrite-bullet" onclick="improveBulletWithAi()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white text-xs font-bold shadow-md shadow-indigo-600/30 transition flex items-center justify-center gap-2">
+                <i data-lucide="wand-2" class="w-4 h-4"></i> Improve with AI
+              </button>
+            </div>
+          </div>
+
+          <!-- AI Results Panel (starts hidden) -->
+          <div id="ai-bullet-results-container" class="space-y-6 pt-6 border-t border-slate-800/80 hidden">
+            <!-- Impact Score & Criteria -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div class="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs text-slate-400">Impact Score</span>
+                  <span id="ai-bullet-impact-score" class="text-sm font-black text-indigo-400">0/100</span>
+                </div>
+                <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                  <div id="ai-bullet-impact-bar" class="h-2 rounded-full bg-indigo-500" style="width: 0%"></div>
+                </div>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 flex items-center" id="ai-check-verb">
+                <span class="text-xs text-slate-400">Action Verb Check</span>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 flex items-center" id="ai-check-metrics">
+                <span class="text-xs text-slate-400">Metrics Check</span>
+              </div>
+            </div>
+
+            <!-- Buzzword warning banner -->
+            <div id="ai-buzzword-notice" class="hidden p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs">
+              <!-- Dynamically populated -->
+            </div>
+
+            <!-- Rewrites List -->
+            <div class="space-y-3">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> High-Impact Google XYZ Formula Rewrites
+              </h4>
+              <div id="ai-rewrites-list" class="space-y-3">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <!-- Power Action Verbs Picker -->
+            <div class="space-y-2.5 pt-2">
+              <h4 class="text-xs font-bold text-slate-300">
+                Recommended Power Action Verbs (Click to insert):
+              </h4>
+              <div id="ai-recommended-verbs" class="flex flex-wrap gap-1.5">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================== -->
+      <!-- RESUME ANALYSIS HISTORY SECTION -->
+      <!-- ============================================================== -->
+      <div id="resume-history-section" class="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+              <i data-lucide="history" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-white">Your Resume Analysis History</h3>
+              <p class="text-xs text-slate-400">Persisted securely in PostgreSQL for your account</p>
+            </div>
+          </div>
+          <button onclick="loadResumeHistory()" class="p-2 rounded-xl text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 transition" title="Refresh history">
+            <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div id="resume-history-empty" class="text-center py-10 text-slate-500 text-xs hidden">
+          <i data-lucide="file-text" class="w-8 h-8 text-slate-600 mx-auto mb-2"></i>
+          <span>No resumes analyzed yet. Upload your resume above to generate your first ATS intelligence report.</span>
+        </div>
+
+        <div id="resume-history-table-wrapper" class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-800 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                <th class="py-2.5 px-4">Document</th>
+                <th class="py-2.5 px-4">Role Benchmark</th>
+                <th class="py-2.5 px-4">ATS Score</th>
+                <th class="py-2.5 px-4">JD Match</th>
+                <th class="py-2.5 px-4">Scanned On</th>
+                <th class="py-2.5 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="resume-history-tbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- 6. AUTHENTICATION VIEW (SPLIT LAYOUT) -->
+    <!-- ========================================== -->
+    <section id="view-auth" class="space-y-6 hidden animate-fade-in py-2">
+      <!-- Breadcrumb / Back Navigation -->
+      <div id="auth-back-nav" class="hidden items-center justify-between pb-2">
+        <button onclick="switchTab('dashboard')" class="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-white transition group">
+          <i data-lucide="arrow-left" class="w-4 h-4 text-indigo-400 group-hover:-translate-x-1 transition-transform"></i>
+          <span>Back to Dashboard</span>
+        </button>
+        <span class="text-xs text-slate-500">Secure Authentication &bull; Pathify-AI</span>
+      </div>
+
+      <!-- Split Layout Container -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch max-w-6xl w-full mx-auto">
+        <!-- LEFT SIDE: Branding and Features -->
+        <div class="lg:col-span-6 bg-gradient-to-br from-indigo-950/70 via-slate-900 to-slate-950 border border-indigo-900/40 rounded-3xl p-8 sm:p-10 flex flex-col justify-between relative overflow-hidden shadow-2xl">
+          <!-- Ambient Glow Effect -->
+          <div class="absolute -top-24 -left-24 w-72 h-72 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
+          <div class="absolute -bottom-24 -right-24 w-72 h-72 bg-cyan-600/15 rounded-full blur-3xl pointer-events-none"></div>
+
+          <div class="relative z-10 space-y-6">
+            <!-- Brand Badge -->
+            <div class="flex items-center space-x-3">
+              <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                <i data-lucide="compass" class="w-6 h-6 text-white"></i>
+              </div>
+              <div>
+                <span class="text-2xl font-black tracking-tight text-white">
+                  Pathify<span class="text-indigo-400">.AI</span>
+                </span>
+                <span class="block text-[11px] font-semibold text-indigo-300 uppercase tracking-widest">
+                  Career Roadmap & Skill Engine
+                </span>
+              </div>
+            </div>
+
+            <!-- Value Proposition -->
+            <div class="space-y-3 pt-2">
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-semibold">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-indigo-400"></i>
+                <span>Bridge Your Career Skill Gap</span>
+              </div>
+              <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white leading-tight">
+                From Learning Roadmaps to <span class="bg-gradient-to-r from-indigo-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">Industry-Ready Mastery.</span>
+              </h2>
+              <p class="text-sm text-slate-300 leading-relaxed">
+                Log in to synchronize your verified technical competencies, persist custom career roadmaps, and receive tailored advice from your 24/7 AI mentor.
+              </p>
+            </div>
+
+            <!-- 4 Key Feature Bullets -->
+            <div class="space-y-3.5 pt-4">
+              <div class="flex items-start gap-3.5 p-3 rounded-2xl bg-slate-900/60 border border-slate-800/80">
+                <div class="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shrink-0">
+                  <i data-lucide="git-compare" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <h4 class="text-xs font-bold text-white">Precision Skill-Gap Analyzer</h4>
+                  <p class="text-[11px] text-slate-400 mt-0.5">Automated benchmark against verified role benchmarks for software, data, and AI careers.</p>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-3.5 p-3 rounded-2xl bg-slate-900/60 border border-slate-800/80">
+                <div class="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0">
+                  <i data-lucide="map" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <h4 class="text-xs font-bold text-white">Dynamic Step-by-Step Roadmaps</h4>
+                  <p class="text-[11px] text-slate-400 mt-0.5">Actionable milestones with practical tasks and estimated completion timelines.</p>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-3.5 p-3 rounded-2xl bg-slate-900/60 border border-slate-800/80">
+                <div class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+                  <i data-lucide="bot" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <h4 class="text-xs font-bold text-white">Contextual AI Career Mentor</h4>
+                  <p class="text-[11px] text-slate-400 mt-0.5">Instant guidance for tech stack selection, coding interview strategies, and project portfolios.</p>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-3.5 p-3 rounded-2xl bg-slate-900/60 border border-slate-800/80">
+                <div class="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0">
+                  <i data-lucide="database" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <h4 class="text-xs font-bold text-white">PostgreSQL Account Persistence</h4>
+                  <p class="text-[11px] text-slate-400 mt-0.5">Secure JWT authentication with dedicated database profile tracking across sessions.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Trust Metric -->
+          <div class="relative z-10 pt-6 mt-6 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+            <span class="flex items-center gap-1.5 text-slate-300 font-medium">
+              <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+              PostgreSQL &bull; JWT Protected
+            </span>
+            <span class="text-indigo-400 font-semibold">Pathify AI Engine</span>
+          </div>
+        </div>
+
+        <!-- RIGHT SIDE: Login and Registration Forms -->
+        <div class="lg:col-span-6 bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-10 flex flex-col justify-between shadow-2xl backdrop-blur-xl relative">
+          <div>
+            <!-- Segmented Form Switcher Tabs -->
+            <div class="flex bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800 mb-6">
+              <button id="auth-tab-btn-login" onclick="setAuthMode('login')" class="flex-1 py-2.5 text-xs font-bold rounded-xl transition flex items-center justify-center gap-2 bg-indigo-600 text-white shadow-md shadow-indigo-600/30">
+                <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
+                <span>Sign In</span>
+              </button>
+              <button id="auth-tab-btn-register" onclick="setAuthMode('register')" class="flex-1 py-2.5 text-xs font-bold rounded-xl transition flex items-center justify-center gap-2 text-slate-400 hover:text-white">
+                <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+                <span>Create Account</span>
+              </button>
+            </div>
+
+            <!-- Form Headings -->
+            <div class="mb-6">
+              <h3 id="auth-heading-title" class="text-2xl font-bold text-white tracking-tight">Welcome back</h3>
+              <p id="auth-heading-desc" class="text-xs text-slate-400 mt-1.5 leading-relaxed">
+                Sign in with your email and password to access your career roadmaps and saved skill assessments.
+              </p>
+            </div>
+
+            <!-- Feedback Alert Banner -->
+            <div id="auth-alert" class="hidden mb-6 p-3.5 rounded-xl text-xs font-medium border flex items-start gap-2.5 transition">
+              <i id="auth-alert-icon" data-lucide="alert-circle" class="w-4 h-4 shrink-0 mt-0.5"></i>
+              <span id="auth-alert-text" class="flex-1">Alert message</span>
+            </div>
+
+            <!-- ===================== LOGIN FORM ===================== -->
+            <form id="form-login" method="post" action="/api/auth/login" autocomplete="on" onsubmit="handleLoginSubmit(event)" class="space-y-4">
+              <!-- Email Field -->
+              <div>
+                <label for="login-email" class="block text-xs font-semibold text-slate-300 mb-1.5">Email Address</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <i data-lucide="mail" class="w-4 h-4"></i>
+                  </div>
+                  <input type="email" id="login-email" name="email" autocomplete="username" required placeholder="name@example.com" class="w-full bg-slate-950/80 border border-slate-700 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                </div>
+              </div>
+
+              <!-- Password Field -->
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <label for="login-password" class="block text-xs font-semibold text-slate-300">Password</label>
+                  <a href="javascript:void(0)" onclick="setAuthMode('forgot')" class="text-[11px] text-indigo-400 hover:text-indigo-300 transition">Forgot password?</a>
+                </div>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <i data-lucide="lock" class="w-4 h-4"></i>
+                  </div>
+                  <input type="password" id="login-password" name="password" autocomplete="current-password" required placeholder="Enter your password" class="w-full bg-slate-950/80 border border-slate-700 rounded-xl pl-10 pr-11 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                  <button type="button" onclick="togglePasswordVisibility('login-password', 'login-pwd-toggle-icon')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white transition">
+                    <i id="login-pwd-toggle-icon" data-lucide="eye" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Remember Me Checkbox -->
+              <div class="flex items-center justify-between pt-1">
+                <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-400 select-none">
+                  <input type="checkbox" id="login-remember" checked class="w-4 h-4 rounded bg-slate-800 border-slate-700 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-slate-900">
+                  <span>Remember me on this browser</span>
+                </label>
+              </div>
+
+              <!-- Submit Button -->
+              <button type="submit" id="login-submit-btn" class="w-full mt-2 py-3.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 transition disabled:opacity-60 disabled:cursor-not-allowed">
+                <span id="login-btn-spinner" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin hidden"></span>
+                <i id="login-btn-icon" data-lucide="log-in" class="w-4 h-4"></i>
+                <span id="login-btn-text">Sign In to Pathify AI</span>
+              </button>
+            </form>
+
+            <!-- ===================== REGISTRATION FORM ===================== -->
+            <form id="form-register" method="post" action="/api/auth/register" autocomplete="on" onsubmit="handleRegisterSubmit(event)" class="space-y-4 hidden">
+              <!-- Full Name Field -->
+              <div>
+                <label for="register-name" class="block text-xs font-semibold text-slate-300 mb-1.5">Full Name</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <i data-lucide="user" class="w-4 h-4"></i>
+                  </div>
+                  <input type="text" id="register-name" name="name" autocomplete="name" required placeholder="e.g. John Doe" class="w-full bg-slate-950/80 border border-slate-700 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                </div>
+              </div>
+
+              <!-- Email Field -->
+              <div>
+                <label for="register-email" class="block text-xs font-semibold text-slate-300 mb-1.5">Email Address</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <i data-lucide="mail" class="w-4 h-4"></i>
+                  </div>
+                  <input type="email" id="register-email" name="email" autocomplete="username" required placeholder="you@domain.com" class="w-full bg-slate-950/80 border border-slate-700 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                </div>
+              </div>
+
+              <!-- Password Field -->
+              <div>
+                <label for="register-password" class="block text-xs font-semibold text-slate-300 mb-1.5">Create Password</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <i data-lucide="lock" class="w-4 h-4"></i>
+                  </div>
+                  <input type="password" id="register-password" name="password" autocomplete="new-password" required minlength="6" placeholder="At least 6 characters" oninput="validatePasswordMatch()" onchange="validatePasswordMatch()" class="w-full bg-slate-950/80 border border-slate-700 rounded-xl pl-10 pr-11 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                  <button type="button" onclick="togglePasswordVisibility('register-password', 'reg-pwd-toggle-icon')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white transition">
+                    <i id="reg-pwd-toggle-icon" data-lucide="eye" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Confirm Password Field -->
+              <div>
+                <label for="register-confirm-password" class="block text-xs font-semibold text-slate-300 mb-1.5">Confirm Password</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <i data-lucide="shield-check" class="w-4 h-4"></i>
+                  </div>
+                  <input type="password" id="register-confirm-password" name="confirm_password" autocomplete="new-password" required minlength="6" placeholder="Re-enter password" oninput="validatePasswordMatch()" onchange="validatePasswordMatch()" class="w-full bg-slate-950/80 border border-slate-700 rounded-xl pl-10 pr-11 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                  <button type="button" onclick="togglePasswordVisibility('register-confirm-password', 'reg-confirm-pwd-toggle-icon')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white transition">
+                    <i id="reg-confirm-pwd-toggle-icon" data-lucide="eye" class="w-4 h-4"></i>
+                  </button>
+                </div>
+                <div id="pwd-match-hint" class="text-[11px] text-slate-400 mt-1 hidden flex items-center gap-1">
+                  <i data-lucide="info" class="w-3.5 h-3.5"></i>
+                  <span id="pwd-match-hint-text">Passwords must match</span>
+                </div>
+              </div>
+
+              <!-- Terms & Privacy info -->
+              <p class="text-[11px] text-slate-400 leading-normal pt-1">
+                By registering, you agree to Pathify AI's educational terms of use and local data persistence guidelines.
+              </p>
+
+              <!-- Submit Button -->
+              <button type="submit" id="register-submit-btn" class="w-full mt-2 py-3.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 transition disabled:opacity-60 disabled:cursor-not-allowed">
+                <span id="register-btn-spinner" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin hidden"></span>
+                <i id="register-btn-icon" data-lucide="user-plus" class="w-4 h-4"></i>
+                <span id="register-btn-text">Create Student Account</span>
+              </button>
+            </form>
+
+            <!-- ===================== FORGOT PASSWORD FORM ===================== -->
+            <form id="form-forgot" method="post" action="#" autocomplete="on" onsubmit="handleForgotPasswordSubmit(event)" class="space-y-4 hidden">
+              <!-- Email Field -->
+              <div>
+                <label for="forgot-email" class="block text-xs font-semibold text-slate-300 mb-1.5">Registered Email Address</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <i data-lucide="mail" class="w-4 h-4"></i>
+                  </div>
+                  <input type="email" id="forgot-email" name="email" autocomplete="email" required placeholder="name@example.com" class="w-full bg-slate-950/80 border border-slate-700 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                </div>
+                <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                  Enter your registered email address. We will dispatch a secure, single-use password reset link via Resend. The link will expire in 20 minutes.
+                </p>
+              </div>
+
+              <!-- Submit Button -->
+              <button type="submit" id="forgot-submit-btn" class="w-full mt-2 py-3.5 bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 transition disabled:opacity-60 disabled:cursor-not-allowed">
+                <span id="forgot-btn-spinner" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin hidden"></span>
+                <i id="forgot-btn-icon" data-lucide="send" class="w-4 h-4"></i>
+                <span id="forgot-btn-text">Send Password Reset Link</span>
+              </button>
+
+              <div class="text-center pt-2">
+                <button type="button" onclick="setAuthMode('login')" class="text-xs text-indigo-400 hover:text-indigo-300 font-semibold transition inline-flex items-center gap-1.5">
+                  <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                  <span>Back to Sign In</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Bottom Switch Prompt -->
+          <div class="pt-6 mt-6 border-t border-slate-800 text-center text-xs text-slate-400">
+            <span id="auth-switch-prompt-text">Don't have an account?</span>
+            <button type="button" id="auth-switch-prompt-btn" onclick="toggleAuthMode()" class="ml-1 text-indigo-400 hover:text-indigo-300 font-bold transition">
+              Create an account &rarr;
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- Save Profile Modal -->
@@ -409,6 +1404,30 @@
     </div>
   </div>
 
+  <!-- Past Assessment History Modal -->
+  <div id="assessment-history-modal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 space-y-4 shadow-2xl relative">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+            <i data-lucide="history" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white">Your Assessment History</h3>
+            <p class="text-xs text-slate-400">Saved in PostgreSQL for your account</p>
+          </div>
+        </div>
+        <button onclick="toggleAssessmentHistoryModal()" class="text-slate-400 hover:text-white text-xl leading-none">&times;</button>
+      </div>
+
+      <div id="assessment-history-container" class="space-y-2.5 max-h-80 overflow-y-auto pr-1">
+        <div class="text-center py-8 text-slate-500 text-xs">
+          Loading assessment history...
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification Container -->
   <div id="toast" class="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm shadow-xl flex items-center gap-2 transform translate-y-20 opacity-0 transition duration-300">
     <i data-lucide="info" class="w-4 h-4 text-indigo-400" id="toast-icon"></i>
@@ -421,5 +1440,6 @@
   </footer>
 
   <script src="app.js"></script>
+  <script src="js/resume.js"></script>
 </body>
 </html>
